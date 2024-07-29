@@ -52,7 +52,7 @@ public class OsmData
             {
                 // get ids for referenced child nodes
                 List<string> nodeChildIDs = wayElement.Descendants("nd")
-                .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("id"))
+                .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("ref"))
                 .ToList();
 
                 // get node children for each id

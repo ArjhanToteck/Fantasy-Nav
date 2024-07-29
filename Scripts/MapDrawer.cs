@@ -25,35 +25,49 @@ public partial class MapDrawer : Node2D
         scaleFactor = Math.Min(scaleFactor, (decimal)mapViewportSize.Y / mapWorldHeight);
 
         GD.Print(scaleFactor);
-
-        _Draw();
     }
 
+    // TODO: draw the map without the stupid draw thing meant for debugging
     public override void _Draw()
     {
         if (osmData == null) return;
 
-        foreach (OsmNode node in osmData.nodes)
+        foreach (OsmWay way in osmData.ways)
         {
-            // calculate new position
-            decimal latitude = node.latitude;
-            decimal longitude = node.longitude;
+            bool first = true;
+            Vector2 previousPosition = Vector2.Zero;
 
-            // account for position
-            latitude -= osmData.minLatitude;
-            longitude -= osmData.minLongitude;
+            foreach (OsmNode node in way.nodeChildren)
+            {
+                // calculate new position
+                decimal latitude = node.latitude;
+                decimal longitude = node.longitude;
 
-            // account for scale
-            latitude *= scaleFactor;
-            longitude *= scaleFactor;
+                // account for position
+                latitude -= osmData.minLatitude;
+                longitude -= osmData.minLongitude;
 
-            // convert to float and vector2 with inverse Y axis
-            Vector2 position = new Vector2((float)longitude, mapViewportSize.Y - (float)latitude);
+                // account for scale
+                latitude *= scaleFactor;
+                longitude *= scaleFactor;
 
-            // NOTE: some positions will be slightly out of bounds, that is just because they are still included in OpenStreetMap despite the boundaries set
+                // convert to float and vector2 with inverse Y axis
+                Vector2 position = new Vector2((float)longitude, mapViewportSize.Y - (float)latitude);
 
-            // draw node
-            DrawCircle(position, 5, Colors.Red);
+                // NOTE: some positions will be slightly out of bounds, that is just because they are still included in OpenStreetMap despite the boundaries set
+
+                // draw line if there was a previous node
+                if (!first)
+                {
+                    DrawLine(position, previousPosition, Colors.Red, 2);
+                }
+                else
+                {
+                    first = false;
+                }
+
+                previousPosition = position;
+            }
         }
     }
 }
