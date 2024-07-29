@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "kko/JyhDgLJGA5VmqbU1y3avcVyWEjogxMoJ9BxkiwGxVpPobOe0CIpiXRRwE0AEkg1fqrX1Dqqzn8v4WLxlJQ==",
+  "success": true,
+  "projectFilePath": "/home/aless/Dokumente/Programming/Map Game Thing/Map Game Thing.csproj",
+  "expectedPackageFiles": [
+    "/home/aless/.nuget/packages/godot.sourcegenerators/4.2.2/godot.sourcegenerators.4.2.2.nupkg.sha512",
+    "/home/aless/.nuget/packages/godotsharp/4.2.2/godotsharp.4.2.2.nupkg.sha512",
+    "/home/aless/.nuget/packages/godotsharpeditor/4.2.2/godotsharpeditor.4.2.2.nupkg.sha512",
+    "/home/aless/.nuget/packages/microsoft.netcore.app.ref/6.0.32/microsoft.netcore.app.ref.6.0.32.nupkg.sha512",
+    "/home/aless/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.32/microsoft.aspnetcore.app.ref.6.0.32.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,13 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1722281079
+icon.svg::CompressedTexture2D::7073484797817773614::1721875544::1721875549::1::::<><>::
+OpenStreetMapAPI.tscn::PackedScene::4341647798359548915::1721969636::0::1::::<><>::res://Scripts/OpenStreetMapAPI.cs
+::res://Scripts/::1721969104
+MapDrawer.cs::CSharpScript::-1::1721969515::0::1::::<>Node<>::
+OpenStreetMapAPI.cs::CSharpScript::-1::1721969629::0::1::::<>Node<>::
+OsmData.cs::CSharpScript::-1::1721969371::0::1::::<><>::
+OsmDeserializer.cs::CSharpScript::-1::1721969111::0::1::::<>Node<>::
+OsmElement.cs::CSharpScript::-1::1721968127::0::1::::<><>::
+OsmNode.cs::CSharpScript::-1::1721968132::0::1::::<><>::
+OsmTag.cs::CSharpScript::-1::1721966561::0::1::::<><>::
+OsmWay.cs::CSharpScript::-1::1721967607::0::1::::<><>::
