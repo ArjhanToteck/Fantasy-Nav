@@ -37,20 +37,40 @@ public class OsmData
 
         // nodes
         List<OsmNode> nodes = xmlDocument.Descendants("node")
-            .Select(x => new OsmNode
+            .Select(nodeElement => new OsmNode
             {
-                id = (string)x.Attribute("id"),
-                latitude = (decimal)x.Attribute("lat"),
-                longitude = (decimal)x.Attribute("lon")
+                id = (string)nodeElement.Attribute("id"),
+                latitude = (decimal)nodeElement.Attribute("lat"),
+                longitude = (decimal)nodeElement.Attribute("lon")
             })
             .ToList();
 
         // ways
         // TODO: load node references too
         List<OsmWay> ways = xmlDocument.Descendants("way")
-            .Select(x => new OsmWay
+            .Select((wayElement) =>
             {
-                id = (string)x.Attribute("id")
+                // get ids for referenced child nodes
+                List<string> nodeChildIDs = wayElement.Descendants("nd")
+                .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("id"))
+                .ToList();
+
+                // get node children for each id
+                List<OsmNode> nodeChildren = nodeChildIDs
+                .Select((id) =>
+                {
+                    // find node with matching id in list
+                    return nodes.Find(node => node.id == id);
+                })
+                .ToList();
+
+                // create way with retrieved data
+                return new OsmWay
+                {
+                    id = (string)wayElement.Attribute("id"),
+                    nodeChildIDs = nodeChildIDs,
+                    nodeChildren = nodeChildren
+                };
             })
             .ToList();
 

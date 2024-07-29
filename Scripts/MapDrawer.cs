@@ -51,7 +51,6 @@ public partial class MapDrawer : Node2D
             Vector2 position = new Vector2((float)longitude, mapViewportSize.Y - (float)latitude);
 
             // NOTE: some positions will be slightly out of bounds, that is just because they are still included in OpenStreetMap despite the boundaries set
-            GD.Print(position);
 
             // draw node
             DrawCircle(position, 5, Colors.Red);
