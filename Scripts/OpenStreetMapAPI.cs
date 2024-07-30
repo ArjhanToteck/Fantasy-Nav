@@ -28,7 +28,6 @@ public partial class OpenStreetMapAPI : Node
 		};
 
 		FetchMap(defaultLocation, defaultMapSize, callback);
-
 	}
 
 	public void FetchMap(Vector2 position, Vector2 size, Action<string> callback)
