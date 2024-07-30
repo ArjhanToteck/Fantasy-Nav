@@ -40,6 +40,7 @@ public class OsmData
             .Select(nodeElement => new OsmNode
             {
                 id = (string)nodeElement.Attribute("id"),
+                visible = (bool)nodeElement.Attribute("visible"),
                 latitude = (decimal)nodeElement.Attribute("lat"),
                 longitude = (decimal)nodeElement.Attribute("lon")
             })
@@ -68,6 +69,7 @@ public class OsmData
                 return new OsmWay
                 {
                     id = (string)wayElement.Attribute("id"),
+                    visible = (bool)wayElement.Attribute("visible"),
                     nodeChildIDs = nodeChildIDs,
                     nodeChildren = nodeChildren
                 };

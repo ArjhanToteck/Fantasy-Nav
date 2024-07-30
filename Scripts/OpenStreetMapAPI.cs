@@ -10,8 +10,6 @@ using System.Web;
 public partial class OpenStreetMapAPI : Node
 {
 	private const string apiUrl = "https://www.openstreetmap.org/api/0.6/map?bbox=";
-	private readonly Vector2 defaultLocation = new Vector2(47.99075f, -84.77313f);
-	private readonly Vector2 defaultMapSize = new Vector2(0.005f, 0.005f);
 
 	private HttpRequest httpRequest;
 
@@ -19,15 +17,6 @@ public partial class OpenStreetMapAPI : Node
 	public override void _Ready()
 	{
 		httpRequest = GetNode<HttpRequest>("HTTPRequest");
-		MapDrawer mapDrawer = GetNode<MapDrawer>("MapDrawer");
-
-		Action<string> callback = (osmResponse) =>
-		{
-			OsmData osmData = OsmData.FromRawOsm(osmResponse);
-			mapDrawer.DrawMap(osmData);
-		};
-
-		FetchMap(defaultLocation, defaultMapSize, callback);
 	}
 
 	public void FetchMap(Vector2 position, Vector2 size, Action<string> callback)

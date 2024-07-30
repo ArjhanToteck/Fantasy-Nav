@@ -20,6 +20,9 @@ public partial class MapDrawer : Node2D
 
         foreach (OsmWay way in osmData.ways)
         {
+            // skip invisible ways
+            if (!way.visible) continue;
+
             // TODO: shade polygons by tag
             Polygon2D wayPolygon = new Polygon2D();
 
