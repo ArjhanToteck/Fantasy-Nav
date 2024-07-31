@@ -37,12 +37,24 @@ public class OsmData
 
         // nodes
         List<OsmNode> nodes = xmlDocument.Descendants("node")
-            .Select(nodeElement => new OsmNode
+            .Select((nodeElement) =>
             {
-                id = (string)nodeElement.Attribute("id"),
-                visible = (bool)nodeElement.Attribute("visible"),
-                latitude = (decimal)nodeElement.Attribute("lat"),
-                longitude = (decimal)nodeElement.Attribute("lon")
+                // create dictionary for tags
+                Dictionary<string, string> tags = nodeElement.Descendants("tag")
+                    .ToDictionary(
+                        tagElement => (string)tagElement.Attribute("k"),
+                        tagElement => (string)tagElement.Attribute("v")
+                    );
+
+                // create and return node
+                return new OsmNode
+                {
+                    id = (string)nodeElement.Attribute("id"),
+                    visible = (bool)nodeElement.Attribute("visible"),
+                    tags = tags,
+                    latitude = (decimal)nodeElement.Attribute("lat"),
+                    longitude = (decimal)nodeElement.Attribute("lon")
+                };
             })
             .ToList();
 
@@ -51,6 +63,13 @@ public class OsmData
         List<OsmWay> ways = xmlDocument.Descendants("way")
             .Select((wayElement) =>
             {
+                // create dictionary for tags
+                Dictionary<string, string> tags = wayElement.Descendants("tag")
+                    .ToDictionary(
+                        tagElement => (string)tagElement.Attribute("k"),
+                        tagElement => (string)tagElement.Attribute("v")
+                    );
+
                 // get ids for referenced child nodes
                 List<string> nodeChildIDs = wayElement.Descendants("nd")
                 .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("ref"))
@@ -70,8 +89,9 @@ public class OsmData
                 {
                     id = (string)wayElement.Attribute("id"),
                     visible = (bool)wayElement.Attribute("visible"),
+                    tags = tags,
                     nodeChildIDs = nodeChildIDs,
-                    nodeChildren = nodeChildren
+                    nodeChildren = nodeChildren,
                 };
             })
             .ToList();

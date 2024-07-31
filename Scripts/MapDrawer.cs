@@ -23,24 +23,51 @@ public partial class MapDrawer : Node2D
             // skip invisible ways
             if (!way.visible) continue;
 
-            // TODO: shade polygons by tag
-            Polygon2D wayPolygon = new Polygon2D();
-
-            // get vertices from node positions
-            Vector2[] vertices = way.nodeChildren
-                .Select((node) =>
-                {
-                    // convert latitude and longitude to in-game position
-                    return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
-                })
-                .ToArray();
-
-            // set polygon vertices
-            wayPolygon.Polygon = vertices;
-
-            // add polygon as child
-            AddChild(wayPolygon);
+            // add way node as child (godot node not osm node)
+            Node2D wayNode = CreateWayNode(way, mapWorldHeight, mapWorldWidth);
+            AddChild(wayNode);
         }
+    }
+
+    public Node2D CreateWayNode(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    {
+        Node2D wayNode;
+
+        // get points from node positions
+        Vector2[] points = way.nodeChildren
+            .Select((node) =>
+            {
+                // convert latitude and longitude to in-game position
+                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
+            })
+            .ToArray();
+
+        // check if the way goes back to the beginning, meaning its a polygon
+        if (way.nodeChildIDs[0] == way.nodeChildIDs.Last())
+        {
+            Polygon2D wayPolygon = new Polygon2D
+            {
+                // set polygon vertices to node positions
+                Polygon = points
+            };
+
+            // return this new polygon
+            wayNode = wayPolygon;
+        }
+        else // way is a line
+        {
+            Line2D wayLine = new Line2D
+            {
+                // set line points to node positions
+                Points = points,
+                DefaultColor = Colors.Black
+            };
+
+            // return this new line
+            wayNode = wayLine;
+        }
+
+        return wayNode;
     }
 
     public Vector2 WorldToGamePosition(decimal latitude, decimal longitude, decimal minLatitude, decimal minLongitude, decimal mapWorldHeight, decimal mapWorldWidth)

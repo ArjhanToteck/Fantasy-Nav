@@ -10,12 +10,11 @@
 script = ExtResource("1_eycb7")
 
 [node name="Background" type="TextureRect" parent="."]
+visible = false
 offset_right = 1152.0
 offset_bottom = 648.0
 texture = ExtResource("3_mf3qo")
 expand_mode = 1
-stretch_mode = 5
-flip_v = true
 script = ExtResource("3_4y456")
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
@@ -24,7 +23,11 @@ script = ExtResource("1_a8fi8")
 [node name="HTTPRequest" type="HTTPRequest" parent="OpenStreetMapAPI"]
 
 [node name="MapDrawer" type="Node2D" parent="."]
+position = Vector2(176, 51)
 script = ExtResource("2_ld6h1")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
+
+[node name="Line2D" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0, 93, 43)
