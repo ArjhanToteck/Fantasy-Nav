@@ -78,6 +78,7 @@ public partial class MapDrawer : Node2D
                 // settings to display line properly
                 TextureMode = Line2D.LineTextureMode.Tile,
                 TextureRepeat = TextureRepeatEnum.Enabled,
+                Width = 25,
 
                 // styling
                 DefaultColor = wayStyle.color,

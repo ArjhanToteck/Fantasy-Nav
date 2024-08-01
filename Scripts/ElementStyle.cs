@@ -31,8 +31,7 @@ public class ElementStyle
                 // make roads black
                 return new ElementStyle()
                 {
-                    texture = (Texture2D)GD.Load("res://Images/LineTexture.png"),
-                    color = Color.FromHtml("010023"),
+                    texture = (Texture2D)GD.Load("res://Images/DirtRoad.png"),
                     visibilityLayer = 2
                 };
             }
