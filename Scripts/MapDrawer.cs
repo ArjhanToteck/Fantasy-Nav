@@ -20,17 +20,27 @@ public partial class MapDrawer : Node2D
 
         foreach (OsmWay way in osmData.ways)
         {
-            // skip invisible ways
-            if (!way.visible) continue;
-
             // add way node as child (godot node not osm node)
             Node2D wayNode = CreateWayNode(way, mapWorldHeight, mapWorldWidth);
-            AddChild(wayNode);
+            if (wayNode != null)
+            {
+                AddChild(wayNode);
+            }
         }
+
+        // TODO: also draw nodes for things like stop signs, put little dots or images or something
     }
 
     public Node2D CreateWayNode(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
+        ElementDrawSettings drawSettings = ElementDrawSettings.GetWaySettings(way);
+
+        // don't draw what we don't want to draw
+        if (drawSettings == null)
+        {
+            return null;
+        }
+
         Node2D wayNode;
 
         // get points from node positions
@@ -48,7 +58,9 @@ public partial class MapDrawer : Node2D
             Polygon2D wayPolygon = new Polygon2D
             {
                 // set polygon vertices to node positions
-                Polygon = points
+                Polygon = points,
+                Color = drawSettings.color,
+                Texture = drawSettings.texture
             };
 
             // return this new polygon
@@ -60,12 +72,15 @@ public partial class MapDrawer : Node2D
             {
                 // set line points to node positions
                 Points = points,
-                DefaultColor = Colors.Black
+                DefaultColor = drawSettings.color,
+                Texture = drawSettings.texture
             };
 
             // return this new line
             wayNode = wayLine;
         }
+
+        wayNode.VisibilityLayer = drawSettings.visibilityLayer;
 
         return wayNode;
     }

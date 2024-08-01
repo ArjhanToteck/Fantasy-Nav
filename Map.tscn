@@ -1,21 +1,29 @@
-[gd_scene load_steps=6 format=3 uid="uid://rkfvofxdbuq"]
+[gd_scene load_steps=7 format=3 uid="uid://rkfvofxdbuq"]
 
 [ext_resource type="Script" path="res://Scripts/OpenStreetMapAPI.cs" id="1_a8fi8"]
 [ext_resource type="Script" path="res://Scripts/Map.cs" id="1_eycb7"]
+[ext_resource type="Texture2D" uid="uid://c85yyxw6j45ot" path="res://Images/Parchment1.png" id="2_2cye5"]
 [ext_resource type="Script" path="res://Scripts/MapDrawer.cs" id="2_ld6h1"]
 [ext_resource type="Script" path="res://Scripts/BackgroundTexture.cs" id="3_4y456"]
-[ext_resource type="Texture2D" uid="uid://dmqsycsleqhub" path="res://Images/Pergament.png" id="3_mf3qo"]
+[ext_resource type="Texture2D" uid="uid://4syft01a83jx" path="res://Images/LineTexture.png" id="4_kwbtn"]
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_eycb7")
 
 [node name="Background" type="TextureRect" parent="."]
-visible = false
-offset_right = 1152.0
-offset_bottom = 648.0
-texture = ExtResource("3_mf3qo")
+offset_right = 1151.0
+offset_bottom = 649.0
+texture = ExtResource("2_2cye5")
 expand_mode = 1
+stretch_mode = 6
 script = ExtResource("3_4y456")
+
+[node name="Line2D" type="Line2D" parent="."]
+texture_repeat = 2
+skew = 0.471239
+points = PackedVector2Array(1927.45, 1113.35, 0, 0, 43, 256)
+texture = ExtResource("4_kwbtn")
+texture_mode = 1
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
 script = ExtResource("1_a8fi8")
@@ -28,6 +36,3 @@ script = ExtResource("2_ld6h1")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
-
-[node name="Line2D" type="Line2D" parent="."]
-points = PackedVector2Array(0, 0, 93, 43)
