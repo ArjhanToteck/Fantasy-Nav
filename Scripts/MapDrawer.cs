@@ -33,10 +33,10 @@ public partial class MapDrawer : Node2D
 
     public Node2D CreateWayNode(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
-        ElementDrawSettings drawSettings = ElementDrawSettings.GetWaySettings(way);
+        ElementStyle wayStyle = ElementStyle.GetWayStyle(way);
 
         // don't draw what we don't want to draw
-        if (drawSettings == null)
+        if (wayStyle == null)
         {
             return null;
         }
@@ -57,10 +57,15 @@ public partial class MapDrawer : Node2D
         {
             Polygon2D wayPolygon = new Polygon2D
             {
+                // settings to display line properly
+                TextureRepeat = TextureRepeatEnum.Enabled,
+
+                // styling
+                Color = wayStyle.color,
+                Texture = wayStyle.texture,
+
                 // set polygon vertices to node positions
                 Polygon = points,
-                Color = drawSettings.color,
-                Texture = drawSettings.texture
             };
 
             // return this new polygon
@@ -70,17 +75,23 @@ public partial class MapDrawer : Node2D
         {
             Line2D wayLine = new Line2D
             {
+                // settings to display line properly
+                TextureMode = Line2D.LineTextureMode.Tile,
+                TextureRepeat = TextureRepeatEnum.Enabled,
+
+                // styling
+                DefaultColor = wayStyle.color,
+                Texture = wayStyle.texture,
+
                 // set line points to node positions
-                Points = points,
-                DefaultColor = drawSettings.color,
-                Texture = drawSettings.texture
+                Points = points
             };
 
             // return this new line
             wayNode = wayLine;
         }
 
-        wayNode.VisibilityLayer = drawSettings.visibilityLayer;
+        wayNode.VisibilityLayer = wayStyle.visibilityLayer;
 
         return wayNode;
     }
