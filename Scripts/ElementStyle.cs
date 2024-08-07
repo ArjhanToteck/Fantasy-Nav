@@ -37,6 +37,8 @@ public class ElementStyle
             }
         }
 
+        return null;
+
         if (way.tags.TryGetValue("landuse", out string landuse))
         {
             if (landuse == "grass")

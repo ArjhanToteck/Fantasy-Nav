@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 public partial class MapDrawer : Node2D
 {
-    Vector2 mapGameSize = new Vector2(1080, 920);
+    Vector2 mapGameSize = new Vector2(5000, 5000);
 
     OsmData osmData;
 

@@ -1,25 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://rkfvofxdbuq"]
+[gd_scene load_steps=5 format=3 uid="uid://rkfvofxdbuq"]
 
 [ext_resource type="Script" path="res://Scripts/OpenStreetMapAPI.cs" id="1_a8fi8"]
 [ext_resource type="Script" path="res://Scripts/Map.cs" id="1_eycb7"]
-[ext_resource type="Texture2D" uid="uid://c85yyxw6j45ot" path="res://Images/Parchment1.png" id="2_2cye5"]
 [ext_resource type="Script" path="res://Scripts/MapDrawer.cs" id="2_ld6h1"]
-[ext_resource type="Script" path="res://Scripts/BackgroundTexture.cs" id="3_4y456"]
+[ext_resource type="Texture2D" uid="uid://bofjntrt3d5lk" path="res://Images/Cathedral.svg" id="6_5cp73"]
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_eycb7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-anchor_mode = 0
+position = Vector2(2822, 2284)
 ignore_rotation = false
-
-[node name="Background" type="TextureRect" parent="Camera2D"]
-offset_right = 1000.0
-offset_bottom = 1000.0
-texture = ExtResource("2_2cye5")
-expand_mode = 1
-stretch_mode = 6
-script = ExtResource("3_4y456")
+zoom = Vector2(2.4, 2.4)
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
 script = ExtResource("1_a8fi8")
@@ -29,3 +21,7 @@ script = ExtResource("1_a8fi8")
 [node name="MapDrawer" type="Node2D" parent="."]
 position = Vector2(176, 51)
 script = ExtResource("2_ld6h1")
+
+[node name="Cathedral" type="Sprite2D" parent="."]
+position = Vector2(1068, 3323)
+texture = ExtResource("6_5cp73")
