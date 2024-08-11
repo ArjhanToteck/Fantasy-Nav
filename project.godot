@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Map Game Thing"
-run/main_scene="res://Map.tscn"
+run/main_scene="res://Scenes/Map.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -21,7 +21,7 @@ project/assembly_name="Map Game Thing"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/bordered-polygon-2d/plugin.cfg")
+enabled=PackedStringArray()
 
 [rendering]
 

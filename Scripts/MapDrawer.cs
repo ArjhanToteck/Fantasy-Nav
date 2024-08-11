@@ -9,6 +9,8 @@ using System.Xml.Linq;
 public partial class MapDrawer : Node2D
 {
     Vector2 mapGameSize = new Vector2(5000, 5000);
+    Color backgroundColor = Color.FromHtml("9d7d44");
+    Color outlineColor = new Color(0.36f, 0.19f, 0, 1);
 
     OsmData osmData;
 
@@ -68,11 +70,36 @@ public partial class MapDrawer : Node2D
         // divide x and y by number of points to get mean
         centerPoint = centerPoint / new Vector2(points.Length, points.Length);
 
-        AddChild(new Sprite2D()
+        // load building scene
+        PackedScene buildingScene = (PackedScene)ResourceLoader.Load("res://Scenes/Building.tscn");
+        Sprite2D buildingSprite = (Sprite2D)buildingScene.Instantiate();
+        buildingSprite.Position = centerPoint;
+
+        // switch building type
+        if (way.tags.TryGetValue("building", out string building))
         {
-            Texture = (Texture2D)GD.Load("res://Images/Cathedral.svg"),
-            Position = centerPoint
-        });
+            if (building == "school")
+            {
+                buildingSprite.Texture = (Texture2D)GD.Load("res://Images/University.svg");
+            }
+            else if (building == "apartments")
+            {
+                buildingSprite.Texture = (Texture2D)GD.Load("res://Images/City.svg");
+            }
+            else if (building == "garage")
+            {
+                buildingSprite.Texture = (Texture2D)GD.Load("res://Images/Shed.svg");
+            }
+            else if (way.tags.ContainsKey("religion"))
+            {
+                buildingSprite.Texture = (Texture2D)GD.Load("res://Images/Cathedral.svg");
+            }
+        }
+
+        AddChild(buildingSprite);
+
+        // set flow map
+        ((ShaderMaterial)buildingSprite.Material).SetShaderParameter("flowMap", (Texture2D)GD.Load("res://Images/FlowMap.jpg"));
     }
 
     public void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
@@ -85,8 +112,8 @@ public partial class MapDrawer : Node2D
                 return;
             }
 
-            Color color = new Color(0.36f, 0.19f, 0, 1);
-            DrawLineFromWay(color, 2, 25, way, mapWorldHeight, mapWorldWidth);
+            DrawLineFromWay(outlineColor, 2, 25, way, mapWorldHeight, mapWorldWidth);
+            DrawLineFromWay(backgroundColor, 3, 20, way, mapWorldHeight, mapWorldWidth);
 
             return;
         }
@@ -134,7 +161,7 @@ public partial class MapDrawer : Node2D
         if (drawSurface)
         {
             DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth);
-            DrawLineFromWay(color, layer, width, way, mapWorldHeight, mapWorldWidth);
+            DrawLineFromWay(outlineColor, layer, width, way, mapWorldHeight, mapWorldWidth);
         }
     }
 
