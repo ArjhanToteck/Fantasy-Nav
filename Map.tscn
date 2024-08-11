@@ -8,7 +8,7 @@
 script = ExtResource("1_eycb7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(734, 2598)
+position = Vector2(3385, 377)
 ignore_rotation = false
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]

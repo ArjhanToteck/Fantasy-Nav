@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 
 public partial class MapDrawer : Node2D
@@ -22,118 +23,161 @@ public partial class MapDrawer : Node2D
         foreach (OsmWay way in osmData.ways)
         {
             // add way node as child (godot node not osm node)
-            Node2D wayNode = CreateWayNode(way, mapWorldHeight, mapWorldWidth);
-            if (wayNode != null)
-            {
-                GD.Print("adding child");
-                AddChild(wayNode);
-            }
+            DrawWayNode(way, mapWorldHeight, mapWorldWidth);
         }
 
         // TODO: also draw nodes for things like stop signs, put little dots or images or something
     }
 
-    public Node2D CreateWayNode(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    public void DrawWayNode(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
         // check if invisible
         if (!way.visible)
         {
-            return null;
+            return;
         }
 
         // check if building
         if (way.tags.ContainsKey("building"))
         {
-            return CreateBuilding(way, mapWorldHeight, mapWorldWidth);
+            DrawBuilding(way, mapWorldHeight, mapWorldWidth);
         }
         // check if road
         else if (way.tags.ContainsKey("highway"))
         {
-            return CreateRoad(way, mapWorldHeight, mapWorldWidth);
+            DrawRoad(way, mapWorldHeight, mapWorldWidth);
         }
-        // check if land
-        else if (way.tags.ContainsKey("landuse") || way.tags.ContainsKey("leisure"))
+        // check if surface
+        else if (way.tags.ContainsKey("landuse") || way.tags.ContainsKey("leisure") || way.tags.ContainsKey("water"))
         {
-            return CreateLand(way, mapWorldHeight, mapWorldWidth);
+            DrawSurface(way, mapWorldHeight, mapWorldWidth);
+        }
+    }
+
+    public void DrawBuilding(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    {
+        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth);
+        Vector2 centerPoint = Vector2.Zero;
+
+        // add all points together
+        foreach (Vector2 point in points)
+        {
+            centerPoint += point;
         }
 
-        // we don't care if it's not what on of these
-        return null;
+        // divide x and y by number of points to get mean
+        centerPoint = centerPoint / new Vector2(points.Length, points.Length);
+
+        AddChild(new Sprite2D()
+        {
+            Texture = (Texture2D)GD.Load("res://Images/Cathedral.svg"),
+            Position = centerPoint
+        });
     }
 
-    public Polygon2D CreateBuilding(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
-    {
-        return null;
-    }
-
-    public Line2D CreateRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    public void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
         if (way.tags.TryGetValue("highway", out string highway))
         {
             // exclude footways and paths
             if (highway == "footway" || highway == "path")
             {
-                return null;
+                return;
             }
 
-            // TODO: also add dirt road for smaller highways (need to make dirt road look cleaner too)
+            Color color = new Color(0.36f, 0.19f, 0, 1);
+            DrawLineFromWay(color, 2, 25, way, mapWorldHeight, mapWorldWidth);
 
-            GD.Print(GetPointsFromWay(way, mapWorldHeight, mapWorldWidth));
-            // create stone road
-            return new Line2D()
-            {
-                Points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
-                Texture = (Texture2D)GD.Load("res://Images/StoneRoad.png"),
-                TextureMode = Line2D.LineTextureMode.Tile,
-                TextureRepeat = TextureRepeatEnum.Enabled,
-                Width = 25,
-                VisibilityLayer = 2
-            };
+            return;
         }
-
-        return null;
     }
 
-    public Polygon2D CreateLand(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    public void DrawSurface(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
+        bool drawSurface = false;
+        Color color = Colors.White;
+        uint layer = 0;
+        float width = 0;
+
         if (way.tags.TryGetValue("landuse", out string landuse))
         {
             if (landuse == "grass")
             {
-                // make grass green
-                return new Polygon2D()
-                {
-                    Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
-                    VisibilityLayer = 3,
-                    Color = Colors.SeaGreen
-                };
+                // draw grass
+                drawSurface = true;
+                color = new Color(0.30f, 0.32f, 0.23f, 1);
+                layer = 3;
+                width = 25;
             }
         }
         else if (way.tags.TryGetValue("leisure", out string leisure))
         {
             if (leisure == "park")
             {
-                // make park green
-                return new Polygon2D()
-                {
-                    Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
-                    VisibilityLayer = 1,
-                    Color = Colors.SeaGreen
-                };
+                // draw park
+                drawSurface = true;
+                color = new Color(0.30f, 0.32f, 0.23f, 1);
+                layer = 1;
+                width = 25;
             }
         }
         else if (way.tags.TryGetValue("water", out string water))
         {
-            // make water blue
-            return new Polygon2D()
-            {
-                Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
-                VisibilityLayer = 1,
-                Color = Colors.MediumBlue
-            };
+            // draw water
+            drawSurface = true;
+            color = new Color(0.36f, 0.19f, 0, 1);
+            layer = 1;
+            width = 25;
         }
 
-        return null;
+        // check if we decided to draw land earlier
+        if (drawSurface)
+        {
+            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth);
+            DrawLineFromWay(color, layer, width, way, mapWorldHeight, mapWorldWidth);
+        }
+    }
+
+    void DrawLineFromWay(Color color, uint layer, float width, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    {
+        bool closed = false;
+        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth);
+
+        // check if first and last points match
+        if (points[0] == points[points.Length - 1])
+        {
+            closed = true;
+            List<Vector2> pointsList = points.ToList();
+
+            // remove last element (Godot doesn't like having the same one twice instead of doing closed)
+            pointsList.RemoveAt(pointsList.Count - 1);
+
+            points = pointsList.ToArray();
+        }
+
+        AddChild(new Line2D()
+        {
+            Points = points,
+            Texture = (Texture2D)GD.Load("res://Images/LineTexture.png"),
+            TextureMode = Line2D.LineTextureMode.Tile,
+            TextureRepeat = TextureRepeatEnum.Enabled,
+            Width = width,
+            VisibilityLayer = layer,
+            DefaultColor = color,
+            JointMode = Line2D.LineJointMode.Round,
+            Closed = closed
+        });
+    }
+
+    void DrawPolygonFromWay(Color color, uint layer, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    {
+        AddChild(new Polygon2D()
+        {
+            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
+            VisibilityLayer = layer,
+            Color = color
+        });
+
     }
 
     public Vector2[] GetPointsFromWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)

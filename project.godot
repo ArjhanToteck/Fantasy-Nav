@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 project/assembly_name="Map Game Thing"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/bordered-polygon-2d/plugin.cfg")
+
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.614857, 0.488993, 0.267036, 1)
