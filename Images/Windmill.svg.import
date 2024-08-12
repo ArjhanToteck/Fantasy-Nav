@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgh6hasypxty5"
-path="res://.godot/imported/Shedoutline.svg-1643a4cd8bfdd2ce950eecb58714e7c8.ctex"
+uid="uid://c8pyh8hh286os"
+path="res://.godot/imported/Windmill.svg-47b327f2a0d173c177c515d1c0401126.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Images/Shedoutline.svg"
-dest_files=["res://.godot/imported/Shedoutline.svg-1643a4cd8bfdd2ce950eecb58714e7c8.ctex"]
+source_file="res://Images/Windmill.svg"
+dest_files=["res://.godot/imported/Windmill.svg-47b327f2a0d173c177c515d1c0401126.ctex"]
 
 [params]
 

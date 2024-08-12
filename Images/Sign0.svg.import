@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmca5rggty0f6"
-path="res://.godot/imported/Desert.png-5ddeb061a38329422db0d9cb2b1394d7.ctex"
+uid="uid://q7c3p7nvpoa2"
+path="res://.godot/imported/Sign0.svg-0945ea2403a8c402756c77e825fd588b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Images/Desert.png"
-dest_files=["res://.godot/imported/Desert.png-5ddeb061a38329422db0d9cb2b1394d7.ctex"]
+source_file="res://Images/Sign0.svg"
+dest_files=["res://.godot/imported/Sign0.svg-0945ea2403a8c402756c77e825fd588b.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

@@ -12,5 +12,6 @@ shader_parameter/flowMap = ExtResource("2_lhfbk")
 [node name="Building" type="Sprite2D"]
 modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 1)
+visibility_layer = 9
 material = SubResource("ShaderMaterial_kt1p2")
 texture = ExtResource("3_wfi0q")

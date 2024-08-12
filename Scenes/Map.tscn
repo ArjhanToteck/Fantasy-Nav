@@ -1,15 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://rkfvofxdbuq"]
+[gd_scene load_steps=4 format=3 uid="uid://rkfvofxdbuq"]
 
 [ext_resource type="Script" path="res://Scripts/Map.cs" id="1_ievqj"]
 [ext_resource type="Script" path="res://Scripts/OpenStreetMapAPI.cs" id="2_g4ne2"]
 [ext_resource type="Script" path="res://Scripts/MapDrawer.cs" id="3_3yjvo"]
-[ext_resource type="PackedScene" uid="uid://dt6kn41nj6ofd" path="res://Scenes/Building.tscn" id="4_8ylla"]
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(2606, 4218)
+position = Vector2(1825, 2982)
 ignore_rotation = false
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
@@ -19,5 +18,3 @@ script = ExtResource("2_g4ne2")
 
 [node name="MapDrawer" type="Node2D" parent="."]
 script = ExtResource("3_3yjvo")
-
-[node name="Building" parent="." instance=ExtResource("4_8ylla")]

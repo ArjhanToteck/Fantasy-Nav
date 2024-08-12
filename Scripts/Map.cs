@@ -4,7 +4,7 @@ using System;
 public partial class Map : Node2D
 {
 
-    private readonly Vector2 defaultLocation = new Vector2(47.99075f, -84.77313f);
+    private readonly Vector2 defaultLocation = new Vector2(39.95183f, -75.17171f);
     private readonly Vector2 defaultMapSize = new Vector2(0.005f, 0.005f);
 
     MapDrawer mapDrawer;
