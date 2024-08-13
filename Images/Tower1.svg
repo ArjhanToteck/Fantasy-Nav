@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="128"
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45+devel"
+   inkscape:version="1.3.2 (1:1.3.2+202311252150+091e20ef0f)"
    version="1.0"
-   sodipodi:docname="tower_round_flag_outline.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="Tower1.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <linearGradient
@@ -126,18 +127,6 @@
        x2="75.465492"
        y2="119.49943"
        gradientUnits="userSpaceOnUse" />
-    <filter
-       inkscape:collect="always"
-       id="filter3268"
-       x="-0.10797507"
-       width="1.2159501"
-       y="-0.087821365"
-       height="1.1756427">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.4163667"
-         id="feGaussianBlur3270" />
-    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -149,17 +138,21 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="67.127374"
-     inkscape:cy="65.242415"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="10.871767"
+     inkscape:cy="75.041707"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="svg2"
      showgrid="false"
      width="744.09px"
-     inkscape:window-width="1248"
-     inkscape:window-height="975"
-     inkscape:window-x="426"
-     inkscape:window-y="24" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -171,6 +164,15 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <g
+     inkscape:label="outline copy"
+     inkscape:groupmode="layer"
+     id="g1">
+    <path
+       d="M 62.90625,2.5 62.4375,16.1875 51.25,30.566406 c -0.180736,1.170097 1.719831,1.647783 2.625,2.402344 -1.06152,3.898493 -1.692116,8.299807 -0.25,13.59375 0.816834,0.80704 1.828535,1.365486 2.8125,1.9375 -1.109076,13.990432 -1.84872,24.305873 -0.84375,38.28125 -1.326053,0.035 -8.111279,1.175451 -10.816406,5.384766 0.356398,0.602217 0.938628,1.017064 1.40039,1.537109 -1.586602,6.576835 -2.398951,7.546415 -2.765625,21.453125 7.025064,5.70813 16.098909,7.44416 24.869141,7.85938 6.072715,-0.55848 16.324837,-1.88608 22.375,-7.85938 0.644074,-7.19075 -0.401792,-14.05189 -2.875,-20.78125 l 1.660156,-0.755859 C 87.659242,89.014185 83.35191,86.979429 78.875,85.625 78.25602,72.037206 77.025526,60.286467 74.75,48.34375 l 2.78125,-2.125 c 0.898253,-4.827288 0.01481,-9.219678 -1.84375,-13.65625 0.827864,-0.554055 1.776189,-1.386813 2.009766,-2.177734 L 63.71875,15.625 63.4375,11.634766 c 3.317448,-0.886416 4.583616,0.575242 6.65625,2.61914 8.44295,0.07652 13.111188,-3.289312 19.875,-3.722656 L 89.8125,9.71875 C 84.178479,9.8192782 78.103773,9.7486804 72.5,9.1210938 72.110812,7.2710304 71.525474,6.055722 69.90625,5.4375 67.814379,4.6556135 65.695287,4.4982915 63.525391,4.7402344 L 63.4375,2.5 Z"
+       style="fill:#926b2e;fill-rule:evenodd;stroke-width:1px;fill-opacity:1"
+       id="path2" />
+  </g>
   <g
      inkscape:label="outline"
      inkscape:groupmode="layer"

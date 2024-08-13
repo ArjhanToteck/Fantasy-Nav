@@ -86,7 +86,7 @@ public partial class MapDrawer : Node2D
     void DrawBuilding(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
     {
         // get sprite for icon
-        Texture2D buildingTexture = null;
+        Texture2D buildingTexture = (Texture2D)GD.Load("res://Images/Windmill.svg");
 
         // switch building type (not an actual switch because more than one property used)
         if (way.tags.TryGetValue("building", out string building))
@@ -183,7 +183,6 @@ public partial class MapDrawer : Node2D
             }
 
             DrawLineFromWay(outlineColor, 2, 25, way, mapWorldHeight, mapWorldWidth);
-            DrawLineFromWay(backgroundColor, 3, 20, way, mapWorldHeight, mapWorldWidth);
 
             return;
         }
@@ -255,12 +254,11 @@ public partial class MapDrawer : Node2D
         AddChild(new Line2D()
         {
             Points = points,
-            Texture = (Texture2D)GD.Load("res://Images/LineTexture.png"),
+            Texture = (Texture2D)GD.Load("res://Images/Road.png"),
             TextureMode = Line2D.LineTextureMode.Tile,
             TextureRepeat = TextureRepeatEnum.Enabled,
             Width = width,
             VisibilityLayer = layer,
-            DefaultColor = color,
             JointMode = Line2D.LineJointMode.Round,
             Closed = closed
         });

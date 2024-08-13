@@ -1,36 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="128"
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45+devel"
+   inkscape:version="1.3.2 (1:1.3.2+202311252150+091e20ef0f)"
    version="1.0"
-   sodipodi:docname="sign_post_outline.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="Sign1.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
-    <filter
-       height="1.42432"
-       y="-0.21216"
-       width="1.2179726"
-       x="-0.1089863"
-       id="filter2892"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur2894"
-         stdDeviation="0.72146876"
-         inkscape:collect="always" />
-    </filter>
     <radialGradient
        r="8.2519293"
        fy="222.04396"
@@ -65,19 +54,23 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="64"
-     inkscape:cy="64"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="52.237514"
+     inkscape:cy="67.793863"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g1"
      showgrid="false"
      width="744.09px"
-     inkscape:window-width="1248"
-     inkscape:window-height="975"
-     inkscape:window-x="426"
-     inkscape:window-y="24"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      showguides="true"
-     inkscape:guide-bbox="true" />
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -89,6 +82,15 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <g
+     inkscape:label="Layer 1 copy"
+     inkscape:groupmode="layer"
+     id="g1">
+    <path
+       d="m 59.46875,16.25 c -1.626011,0.08374 -3.282791,0.854062 -2.96875,2.34375 l -1.25,9.65625 0.5,2.15625 -20.15625,3 c 0.478123,2.018901 1.372089,3.954806 1.09375,6.125 l 1.8125,1.5 3,-0.0625 0.1875,6.4375 L 37,49 c -0.04883,3.208329 0.422997,4.916505 0.375,8.125 0.376148,1.076771 0.922493,1.294194 1.90625,1.53125 l 0.5,-0.125 L 40.25,64 l 1.90625,0.90625 8.0625,-0.25 L 56.125,62.875 56.0625,72.75 C 54.581917,78.833085 54.357029,84.916915 55.875,91 v 4.46875 c -1.309824,0.192889 -2.559181,1.164564 -3.6875,1.84375 -1.032118,1.612542 -1.373249,3.35327 -2.5625,4.90625 -1.958045,2.05006 -4.510661,5.1691 -1.6875,6.53125 2.654434,-0.0396 5.977216,-1.58649 8.125,-3 1.29827,0.74527 2.629549,1.30683 4.125,0.96875 2.118326,1.7359 4.714963,2.47268 7.4375,2.78125 2.406726,-0.0468 4.112965,-1.98936 6.4375,-2.25 1.851543,0.44145 1.652042,-0.61656 1.9375,-2.4375 -1.673258,-3.63651 -3.732669,-4.988741 -7.1875,-6.125 0.338329,-3.617114 -3.018219,-4.589636 -6.1875,-4.78125 l -0.46875,-28.8125 c 0.105293,-1.266727 0.513657,-2.981038 0.5625,-4.21875 l 17.46875,-5.28125 5,1.34375 0.75,-4.5625 -1.25,-3.03125 -1.28125,-0.90625 2,-0.75 L 86,39.21875 84.5625,38.125 85.6875,37.8125 84.03125,29.03125 H 83.84375 83.8125 L 76.6875,28.875 75.71875,28.46875 74.375,28.40625 73.5625,28 70.59375,28.21875 62.75,29.375 62.3125,17.96875 C 62.690163,16.769108 61.094761,16.166265 59.46875,16.25 Z"
+       style="fill:#926b2e;fill-rule:evenodd;stroke-width:1px;fill-opacity:1"
+       id="path2" />
+  </g>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"

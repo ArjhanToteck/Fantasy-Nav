@@ -2,16 +2,16 @@
 
 [ext_resource type="Shader" path="res://Shaders/Building.gdshader" id="1_nfplo"]
 [ext_resource type="Texture2D" uid="uid://c3ev5su2choos" path="res://Noise.jpg" id="2_lhfbk"]
-[ext_resource type="Texture2D" uid="uid://bofjntrt3d5lk" path="res://Images/Cathedral.svg" id="3_wfi0q"]
+[ext_resource type="Texture2D" uid="uid://b2ukpu1aitgap" path="res://Images/City.svg" id="3_bw3bx"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kt1p2"]
 shader = ExtResource("1_nfplo")
-shader_parameter/strength = 0.1
+shader_parameter/strength = 0.05
 shader_parameter/flowMap = ExtResource("2_lhfbk")
 
-[node name="Building" type="Sprite2D"]
+[node name="Icon" type="Sprite2D"]
 modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 1)
 visibility_layer = 9
 material = SubResource("ShaderMaterial_kt1p2")
-texture = ExtResource("3_wfi0q")
+texture = ExtResource("3_bw3bx")

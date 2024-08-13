@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="128"
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45+devel"
+   inkscape:version="1.3.2 (1:1.3.2+202311252150+091e20ef0f)"
    version="1.0"
-   sodipodi:docname="windmill_outline.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   sodipodi:docname="Windmill.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <linearGradient
@@ -353,14 +354,6 @@
        x2="40.75"
        y2="101.625"
        gradientUnits="userSpaceOnUse" />
-    <filter
-       inkscape:collect="always"
-       id="filter4106">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="1.5627868"
-         id="feGaussianBlur4108" />
-    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -372,19 +365,23 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-20.015589"
-     inkscape:cy="64.640625"
+     inkscape:zoom="4"
+     inkscape:cx="77.625"
+     inkscape:cy="68.375"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="svg2"
      showgrid="false"
      width="744.09px"
-     inkscape:window-width="1248"
-     inkscape:window-height="975"
-     inkscape:window-x="285"
-     inkscape:window-y="24"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      showguides="true"
-     inkscape:guide-bbox="true" />
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -396,6 +393,10 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <path
+     d="m 91.28125,1.1875 c -2.982683,7.9652235 -6.376778,17.259136 -9.375,25.21875 L 81.5,21.6875 65.71875,6.9375 46.125,3.25 33.25,20.28125 l -3.625,-3.1875 -1.90625,2 2.25,1.625 L 28.625,23.75 c -0.169946,0.357064 -1.599429,-1.379636 -2.28125,-1.15625 -0.857416,0.280916 -0.973789,2.532326 -1.1875,3.0625 l 2.03125,1.15625 -1.5,3.34375 -3.0625,-2.09375 -1.59375,2.71875 10.03125,5.90625 -5.84375,58.78125 -0.6875,0.34375 -4.15625,4.0625 -0.5,5.5625 -12.28125,14.25 2.59375,0.34375 7.6875,-4.53125 3.90625,1.125 -0.28125,1.71875 2.875,0.9375 1.5,-0.9375 0.0625,-0.46875 6.5625,1.9375 -0.0625,1.84375 2.84375,0.9375 L 36.875,121.5 v -0.40625 l 15.0625,4.4375 44.75,-17.21875 -3.84375,-13.34375 -5.15625,-2.0625 -1.71875,-18.78125 20.75,25.5625 1.78125,-2.3125 -2.125,-1.8125 1.4375,-2.34375 1.875,1.125 1.21875,-2.40625 -1.6875,-1.59375 1.125,-2.53125 2.375,1.4375 1.71875,-1.6875 -2.6875,-2.15625 -26.84375,-23.625 -1.65625,-19.4375 21.78125,-36.625 -3,-0.625 -1.46875,2.09375 -2.65625,-1.28125 1.03125,-1.75 -2.21875,-1.4375 -1,2.125 -2.375,-1.125 0.625,-2.25 z"
+     style="fill:#926b2e;fill-opacity:1"
+     id="path2" />
   <g
      inkscape:label="outline"
      inkscape:groupmode="layer"
