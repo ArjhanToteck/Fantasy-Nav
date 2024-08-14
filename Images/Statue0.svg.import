@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://da2u1atwc1t3"
-path="res://.godot/imported/Tent.svg-7c916685c6e71421bfbd3dc6ad24bd28.ctex"
+uid="uid://ddakjylhs63yo"
+path="res://.godot/imported/Statue0.svg-95e2ad09dcd71e13061e5909ad757463.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Images/Tent.svg"
-dest_files=["res://.godot/imported/Tent.svg-7c916685c6e71421bfbd3dc6ad24bd28.ctex"]
+source_file="res://Images/Statue0.svg"
+dest_files=["res://.godot/imported/Statue0.svg-95e2ad09dcd71e13061e5909ad757463.ctex"]
 
 [params]
 

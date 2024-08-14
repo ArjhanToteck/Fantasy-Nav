@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -10,34 +11,30 @@ using System.Xml.Linq;
 
 public partial class MapDrawer : Node2D
 {
-    Vector2 mapGameSize = new Vector2(5000, 5000);
-    Color backgroundColor = Color.FromHtml("9d7d44");
-    Color outlineColor = new Color(0.36f, 0.19f, 0, 1);
-
-    OsmData osmData;
+    Vector2 mapGameSize = new Vector2(10000, 10000);
 
     public void DrawMap(OsmData osmData)
     {
-        this.osmData = osmData;
-
         // get size of map in world units
         decimal mapWorldHeight = osmData.maxLatitude - osmData.minLatitude;
         decimal mapWorldWidth = osmData.maxLongitude - osmData.minLongitude;
 
+        // draw ways
         foreach (OsmWay way in osmData.ways)
         {
             // add way node as child (godot node not osm node)
-            DrawWay(way, mapWorldHeight, mapWorldWidth);
+            DrawWay(way, mapWorldHeight, mapWorldWidth, osmData);
         }
 
+        // draw nodes
         foreach (OsmNode node in osmData.nodes)
         {
             // add node as child
-            DrawNode(node, mapWorldHeight, mapWorldWidth);
+            DrawIcon(node, mapWorldHeight, mapWorldWidth, osmData);
         }
     }
 
-    void DrawWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         // check if invisible
         if (!way.visible)
@@ -45,134 +42,168 @@ public partial class MapDrawer : Node2D
             return;
         }
 
-        // check if building
-        if (way.tags.ContainsKey("building"))
-        {
-            DrawBuilding(way, mapWorldHeight, mapWorldWidth);
-        }
-        // check if road
-        else if (way.tags.ContainsKey("highway"))
-        {
-            DrawRoad(way, mapWorldHeight, mapWorldWidth);
-        }
-        // check if surface
-        else if (way.tags.ContainsKey("landuse") || way.tags.ContainsKey("leisure") || way.tags.ContainsKey("water"))
-        {
-            DrawSurface(way, mapWorldHeight, mapWorldWidth);
-        }
+        // draw way
+        DrawIcon(way, mapWorldHeight, mapWorldWidth, osmData);
+        DrawRoad(way, mapWorldHeight, mapWorldWidth, osmData);
+        DrawSurface(way, mapWorldHeight, mapWorldWidth, osmData);
     }
 
-    void DrawNode(OsmNode node, decimal mapWorldHeight, decimal mapWorldWidth)
-    {
-        Texture2D nodeTexture = null;
-
-        // switch node type (not an actual switch because more than one property used)
-        if (node.tags.ContainsKey("crossing") || node.tags.ContainsKey("traffic_sign"))
-        {
-            // can be Sign0, Sign1, Sign2
-            int variant = GetRandomIntFromId(node.id, 3);
-            nodeTexture = (Texture2D)GD.Load($"res://Images/Sign{variant}.svg");
-            GD.Print("sign", node.id, $"res://Images/Sign{variant}.svg");
-        }
-
-        // draw node
-        if (nodeTexture != null)
-        {
-            Vector2 position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
-            DrawIconAtPoint(nodeTexture, position);
-        }
-    }
-
-    void DrawBuilding(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawIcon(OsmElement element, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         // get sprite for icon
-        Texture2D buildingTexture = (Texture2D)GD.Load("res://Images/Windmill.svg");
+        Texture2D iconTexture = null;
 
-        // switch building type (not an actual switch because more than one property used)
-        if (way.tags.TryGetValue("building", out string building))
+        // switch building type
+        if (element.tags.TryGetValue("building", out string building))
         {
-            if (building == "religious" || building == "church" || way.tags.ContainsKey("religion"))
+            if (building == "religious" || building == "church" || element.tags.ContainsKey("religion"))
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Cathedral.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Cathedral.svg");
             }
             else if (building == "house")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/House.svg");
+                // can be House0 or House1
+                int variant = GetRandomIntFromId(element.id, 2);
+                iconTexture = (Texture2D)GD.Load($"res://Images/House{variant}.svg");
             }
             else if (building == "school" || building == "kindergarten" || building == "college" || building == "university")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/University.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/University.svg");
             }
             else if (building == "apartments")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/City.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/City.svg");
             }
             else if (building == "shed")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Shed.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Shed.svg");
             }
             else if (building == "garage" || building == "carport")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Caravan.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Caravan.svg");
             }
             else if (building == "tower" || building == "water_tower" || building == "transformer_tower")
             {
                 // can be Tower0 or Tower1
-                int variant = GetRandomIntFromId(way.id, 2);
-                buildingTexture = (Texture2D)GD.Load($"res://Images/Tower{variant}.svg");
-                GD.Print("tower", way.id);
+                int variant = GetRandomIntFromId(element.id, 2);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Tower{variant}.svg");
             }
             else if (building == "farm")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Farm.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Farm.svg");
             }
             else if (building == "gatehouse")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Gate.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Gate.svg");
             }
             else if (building == "ruins" || building == "construction")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Ruins.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Ruins.svg");
             }
             else if (building == "tent")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Tent.svg");
+                // can be Tent0 or Tent1
+                int variant = GetRandomIntFromId(element.id, 2);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Tent{variant}.svg");
             }
             else if (building == "windmill")
             {
-                buildingTexture = (Texture2D)GD.Load("res://Images/Windmill.svg");
+                iconTexture = (Texture2D)GD.Load("res://Images/Windmill.svg");
             }
-            else if (way.tags.TryGetValue("man_made", out string manMade))
+            else
             {
-                if (manMade == "water_well")
-                {
-                    buildingTexture = (Texture2D)GD.Load("res://Images/Well.svg");
-                }
+                // default building
             }
         }
-        // TODO: create default buildings
+
+        // switch artwork type
+        if (element.tags.TryGetValue("artwork_type", out string artworkType))
+        {
+            if (artworkType == "statue" || artworkType == "sculpture" || artworkType == "stone" || artworkType == "installation" || artworkType == "bust")
+            {
+                // can be Statue0, Statue1, Statue2, Statue3
+                int variant = GetRandomIntFromId(element.id, 4);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Statue{variant}.svg");
+            }
+        }
+
+        // switch memorial type
+        if (element.tags.TryGetValue("memorial", out string memorial))
+        {
+            if (artworkType == "statue" || artworkType == "sculpture" || artworkType == "stone" || artworkType == "obelisk" || artworkType == "bust")
+            {
+                // can be Statue0, Statue1, Statue2, Statue3
+                int variant = GetRandomIntFromId(element.id, 4);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Statue{variant}.svg");
+            }
+        }
+
+        // switch amenity type
+        if (element.tags.TryGetValue("amenity", out string amenity))
+        {
+            if (amenity == "fountain")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Fountain.svg");
+            }
+        }
+
+        // switch man made type
+        if (element.tags.TryGetValue("man_made", out string manMade))
+        {
+            if (manMade == "water_well")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Well.svg");
+            }
+        }
+
+        if (element.tags.TryGetValue("natural", out string natural))
+        {
+            if (natural == "peak")
+            {
+                // can be Mountain0-Mountain5
+                int variant = GetRandomIntFromId(element.id, 6);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Mountain{variant}.svg");
+            }
+        }
+
+        // check if sign
+        if (element.tags.ContainsKey("crossing") || element.tags.ContainsKey("traffic_sign"))
+        {
+            // can be Sign0, Sign1, Sign2
+            int variant = GetRandomIntFromId(element.id, 3);
+            iconTexture = (Texture2D)GD.Load($"res://Images/Sign{variant}.svg");
+        }
 
         // draw building
-        if (buildingTexture != null)
+        if (iconTexture != null)
         {
-            // calculate position
-            Vector2 centerPoint = Vector2.Zero;
-            Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth);
+            Vector2 position = Vector2.Zero;
 
-            // add all points together
-            foreach (Vector2 point in points)
+            if (element.GetType() == typeof(OsmWay))
             {
-                centerPoint += point;
+                // calculate position as center of way
+                Vector2[] points = GetPointsFromWay((OsmWay)element, mapWorldHeight, mapWorldWidth, osmData);
+
+                // add all points together
+                foreach (Vector2 point in points)
+                {
+                    position += point;
+                }
+
+                // divide x and y by number of points to get mean
+                position = position / new Vector2(points.Length, points.Length);
+            }
+            else
+            {
+                OsmNode node = (OsmNode)element;
+                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
             }
 
-            // divide x and y by number of points to get mean
-            centerPoint = centerPoint / new Vector2(points.Length, points.Length);
-
-            DrawIconAtPoint(buildingTexture, centerPoint);
+            DrawIconAtPoint(iconTexture, position);
         }
     }
 
-    void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         if (way.tags.TryGetValue("highway", out string highway))
         {
@@ -182,62 +213,107 @@ public partial class MapDrawer : Node2D
                 return;
             }
 
-            DrawLineFromWay(outlineColor, 2, 25, way, mapWorldHeight, mapWorldWidth);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 25, way, mapWorldHeight, mapWorldWidth, osmData);
 
             return;
         }
     }
 
-    void DrawSurface(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawSurface(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         bool drawSurface = false;
         Color color = Colors.White;
-        uint layer = 0;
-        float width = 0;
+        int layer = 0;
 
-        if (way.tags.TryGetValue("landuse", out string landuse))
+        if (way.tags.TryGetValue("water", out string water))
+        {
+            // draw water
+            drawSurface = true;
+            color = Color.FromHtml("90784d");
+            layer = 1;
+        }
+        else if (way.tags.TryGetValue("landuse", out string landuse))
         {
             if (landuse == "grass")
             {
                 // draw grass
                 drawSurface = true;
-                color = new Color(0.30f, 0.32f, 0.23f, 1);
+                color = Color.FromHtml("997c3e");
                 layer = 3;
-                width = 25;
             }
         }
-        else if (way.tags.TryGetValue("leisure", out string leisure))
+
+        if (way.tags.TryGetValue("surface", out string surface))
+        {
+            if (surface == "sand")
+            {
+                // draw sand
+                drawSurface = true;
+                color = Color.FromHtml("9c8444");
+                layer = 1;
+            }
+        }
+
+        if (way.tags.TryGetValue("natural", out string natural))
+        {
+            if (natural == "beach")
+            {
+                // draw sand
+                drawSurface = true;
+                color = Color.FromHtml("9c8444");
+                layer = 1;
+            }
+            else if (natural == "sand")
+            {
+                // draw sand
+                drawSurface = true;
+                color = Color.FromHtml("9c8444");
+                layer = 1;
+            }
+        }
+
+        if (way.tags.TryGetValue("leisure", out string leisure))
         {
             if (leisure == "park")
             {
                 // draw park
                 drawSurface = true;
-                color = new Color(0.30f, 0.32f, 0.23f, 1);
+                color = Color.FromHtml("997c3e");
                 layer = 1;
-                width = 25;
+            }
+            else if (leisure == "pitch")
+            {
+                // draw park
+                drawSurface = true;
+                color = Color.FromHtml("8a6a30");
+                layer = 1;
             }
         }
-        else if (way.tags.TryGetValue("water", out string water))
+
+        if (way.tags.TryGetValue("parking", out string parking))
         {
-            // draw water
-            drawSurface = true;
-            color = new Color(0.36f, 0.19f, 0, 1);
-            layer = 1;
-            width = 25;
+            GD.Print("parking", parking);
+            if (parking == "surface")
+            {
+                // draw park
+                drawSurface = true;
+                color = Color.FromHtml("7e5f29");
+                layer = 1;
+            }
         }
 
         // check if we decided to draw land earlier
         if (drawSurface)
         {
-            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth);
-            DrawLineFromWay(outlineColor, layer, width, way, mapWorldHeight, mapWorldWidth);
+            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth, osmData);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 5, way, mapWorldHeight, mapWorldWidth, osmData);
         }
     }
 
-    void DrawLineFromWay(Color color, uint layer, float width, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         bool closed = false;
-        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth);
+        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData);
 
         // check if first and last points match
         if (points[0] == points[points.Length - 1])
@@ -254,22 +330,22 @@ public partial class MapDrawer : Node2D
         AddChild(new Line2D()
         {
             Points = points,
-            Texture = (Texture2D)GD.Load("res://Images/Road.png"),
+            Texture = texture,
             TextureMode = Line2D.LineTextureMode.Tile,
             TextureRepeat = TextureRepeatEnum.Enabled,
             Width = width,
-            VisibilityLayer = layer,
+            ZIndex = layer,
             JointMode = Line2D.LineJointMode.Round,
             Closed = closed
         });
     }
 
-    void DrawPolygonFromWay(Color color, uint layer, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    void DrawPolygonFromWay(Color color, int layer, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         AddChild(new Polygon2D()
         {
-            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth),
-            VisibilityLayer = layer,
+            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData),
+            ZIndex = layer,
             Color = color
         });
 
@@ -283,12 +359,12 @@ public partial class MapDrawer : Node2D
         }
 
         // load building scene
-        PackedScene buildingScene = (PackedScene)ResourceLoader.Load("res://Scenes/Icon.tscn");
-        Sprite2D buildingSprite = (Sprite2D)buildingScene.Instantiate();
-        buildingSprite.Position = position;
-        buildingSprite.Texture = texture;
+        PackedScene iconScene = (PackedScene)ResourceLoader.Load("res://Scenes/Icon.tscn");
+        Sprite2D iconSprite = (Sprite2D)iconScene.Instantiate();
+        iconSprite.Position = position;
+        iconSprite.Texture = texture;
 
-        AddChild(buildingSprite);
+        AddChild(iconSprite);
     }
 
     int GetRandomIntFromId(string id, int max)
@@ -304,7 +380,7 @@ public partial class MapDrawer : Node2D
         return new Random(seed).Next(max);
     }
 
-    Vector2[] GetPointsFromWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth)
+    Vector2[] GetPointsFromWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
     {
         // get points from node positions
         Vector2[] points = way.nodeChildren

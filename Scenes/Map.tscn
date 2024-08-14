@@ -8,8 +8,8 @@
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(1217, 3717)
-ignore_rotation = false
+position = Vector2(2336, 5974)
+anchor_mode = 0
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
 script = ExtResource("2_g4ne2")
@@ -17,4 +17,5 @@ script = ExtResource("2_g4ne2")
 [node name="HTTPRequest" type="HTTPRequest" parent="OpenStreetMapAPI"]
 
 [node name="MapDrawer" type="Node2D" parent="."]
+y_sort_enabled = true
 script = ExtResource("3_3yjvo")

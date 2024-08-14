@@ -12,6 +12,7 @@ shader_parameter/flowMap = ExtResource("2_lhfbk")
 [node name="Icon" type="Sprite2D"]
 modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 1)
-visibility_layer = 9
+z_index = 5
 material = SubResource("ShaderMaterial_kt1p2")
 texture = ExtResource("3_bw3bx")
+offset = Vector2(0, -35)
