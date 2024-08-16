@@ -110,9 +110,16 @@ public partial class MapDrawer : Node2D
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Windmill.svg");
             }
+            else if (building == "hotel")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Inn.svg");
+            }
             else
             {
                 // default building
+                // can be Building0-4
+                int variant = GetRandomIntFromId(element.id, 5);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Building{variant}.svg");
             }
         }
 
@@ -154,8 +161,13 @@ public partial class MapDrawer : Node2D
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Well.svg");
             }
+            else if (manMade == "mineshaft")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Mine.svg");
+            }
         }
 
+        // natural
         if (element.tags.TryGetValue("natural", out string natural))
         {
             if (natural == "peak")
@@ -163,6 +175,48 @@ public partial class MapDrawer : Node2D
                 // can be Mountain0-Mountain5
                 int variant = GetRandomIntFromId(element.id, 6);
                 iconTexture = (Texture2D)GD.Load($"res://Images/Mountain{variant}.svg");
+            }
+            else if (natural == "hill")
+            {
+                // can be Hill 0-2
+                int variant = GetRandomIntFromId(element.id, 3);
+                iconTexture = (Texture2D)GD.Load($"res://Images/Hill{variant}.svg");
+            }
+        }
+
+        // attraction
+        if (element.tags.TryGetValue("attraction", out string attraction))
+        {
+            if (attraction == "maze")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Maze.svg");
+            }
+        }
+
+        // leisure
+        if (element.tags.TryGetValue("leisure", out string leisure))
+        {
+            if (leisure == "maze")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Maze.svg");
+            }
+        }
+
+        // tourism
+        if (element.tags.TryGetValue("tourism", out string tourism))
+        {
+            if (tourism == "hotel")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Inn.svg");
+            }
+        }
+
+        // historic
+        if (element.tags.TryGetValue("historic", out string historic))
+        {
+            if (historic == "mine" || historic == "mine_shaft")
+            {
+                iconTexture = (Texture2D)GD.Load("res://Images/Mine.svg");
             }
         }
 
@@ -225,7 +279,14 @@ public partial class MapDrawer : Node2D
         Color color = Colors.White;
         int layer = 0;
 
-        if (way.tags.TryGetValue("water", out string water))
+        if (way.tags.ContainsKey("building"))
+        {
+            // draw building outline
+            drawSurface = true;
+            color = Color.FromHtml("89652c");
+            layer = 5;
+        }
+        else if (way.tags.ContainsKey("water"))
         {
             // draw water
             drawSurface = true;
@@ -292,7 +353,6 @@ public partial class MapDrawer : Node2D
 
         if (way.tags.TryGetValue("parking", out string parking))
         {
-            GD.Print("parking", parking);
             if (parking == "surface")
             {
                 // draw park

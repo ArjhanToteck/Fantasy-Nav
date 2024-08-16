@@ -8,8 +8,10 @@
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(2336, 5974)
+position = Vector2(1130, 3498)
 anchor_mode = 0
+
+[node name="Polygon2D" type="Polygon2D" parent="Camera2D"]
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
 script = ExtResource("2_g4ne2")

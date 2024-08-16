@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3ev5su2choos"
-path="res://.godot/imported/Noise.jpg-82b03db7cd5f2904488976e8c0e9c8ab.ctex"
+uid="uid://bcgg5ucbjxbot"
+path="res://.godot/imported/Hill0.svg-6fac45e3c0562498188b39bfd5b69b58.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Noise.jpg"
-dest_files=["res://.godot/imported/Noise.jpg-82b03db7cd5f2904488976e8c0e9c8ab.ctex"]
+source_file="res://Images/Hill0.svg"
+dest_files=["res://.godot/imported/Hill0.svg-6fac45e3c0562498188b39bfd5b69b58.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
