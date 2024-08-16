@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dt6kn41nj6ofd"]
 
 [ext_resource type="Shader" path="res://Shaders/Building.gdshader" id="1_nfplo"]
-[ext_resource type="Texture2D" uid="uid://c3ev5su2choos" path="res://Noise.jpg" id="2_lhfbk"]
+[ext_resource type="Texture2D" uid="uid://rf5xpj2gwjlg" path="res://Images/FlowMap.jpg" id="2_lhfbk"]
 [ext_resource type="Texture2D" uid="uid://b2ukpu1aitgap" path="res://Images/City.svg" id="3_bw3bx"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kt1p2"]
