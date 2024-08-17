@@ -8,8 +8,11 @@
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(1130, 3498)
-anchor_mode = 0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Camera2D"]
+offset_right = 1078.0
+offset_bottom = 476.0
+text = "Loading,,,.,."
 
 [node name="OpenStreetMapAPI" type="Node2D" parent="."]
 script = ExtResource("2_g4ne2")

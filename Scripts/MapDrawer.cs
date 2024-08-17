@@ -1,19 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Xml.Linq;
 
 public partial class MapDrawer : Node2D
 {
-    Vector2 mapGameSize = new Vector2(10000, 10000);
-
-    public void DrawMap(OsmData osmData)
+    public void DrawMap(OsmData osmData, Vector2 gameMapSize)
     {
         // get size of map in world units
         decimal mapWorldHeight = osmData.maxLatitude - osmData.minLatitude;
@@ -23,18 +15,18 @@ public partial class MapDrawer : Node2D
         foreach (OsmWay way in osmData.ways)
         {
             // add way node as child (godot node not osm node)
-            DrawWay(way, mapWorldHeight, mapWorldWidth, osmData);
+            DrawWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
         }
 
         // draw nodes
         foreach (OsmNode node in osmData.nodes)
         {
             // add node as child
-            DrawIcon(node, mapWorldHeight, mapWorldWidth, osmData);
+            DrawIcon(node, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
         }
     }
 
-    void DrawWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         // check if invisible
         if (!way.visible)
@@ -43,12 +35,12 @@ public partial class MapDrawer : Node2D
         }
 
         // draw way
-        DrawIcon(way, mapWorldHeight, mapWorldWidth, osmData);
-        DrawRoad(way, mapWorldHeight, mapWorldWidth, osmData);
-        DrawSurface(way, mapWorldHeight, mapWorldWidth, osmData);
+        DrawIcon(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+        DrawRoad(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+        DrawSurface(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
     }
 
-    void DrawIcon(OsmElement element, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawIcon(OsmElement element, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         // get sprite for icon
         Texture2D iconTexture = null;
@@ -60,7 +52,7 @@ public partial class MapDrawer : Node2D
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Cathedral.svg");
             }
-            else if (building == "house")
+            else if (building == "house" || building == "terrace" || building == "detached" || building == "semidetached_house" || building == "bungalow" || building == "	manor" || building == "villa")
             {
                 // can be House0 or House1
                 int variant = GetRandomIntFromId(element.id, 2);
@@ -78,7 +70,7 @@ public partial class MapDrawer : Node2D
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Shed.svg");
             }
-            else if (building == "garage" || building == "carport")
+            else if (building == "garage" || building == "carport" || building == "static_caravan")
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Caravan.svg");
             }
@@ -236,7 +228,7 @@ public partial class MapDrawer : Node2D
             if (element.GetType() == typeof(OsmWay))
             {
                 // calculate position as center of way
-                Vector2[] points = GetPointsFromWay((OsmWay)element, mapWorldHeight, mapWorldWidth, osmData);
+                Vector2[] points = GetPointsFromWay((OsmWay)element, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
 
                 // add all points together
                 foreach (Vector2 point in points)
@@ -250,14 +242,14 @@ public partial class MapDrawer : Node2D
             else
             {
                 OsmNode node = (OsmNode)element;
-                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
+                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth, gameMapSize);
             }
 
             DrawIconAtPoint(iconTexture, position);
         }
     }
 
-    void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawRoad(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         if (way.tags.TryGetValue("highway", out string highway))
         {
@@ -267,18 +259,20 @@ public partial class MapDrawer : Node2D
                 return;
             }
 
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 25, way, mapWorldHeight, mapWorldWidth, osmData);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 25, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
 
             return;
         }
     }
 
-    void DrawSurface(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawSurface(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         bool drawSurface = false;
         Color color = Colors.White;
         int layer = 0;
 
+        /*
+        // yeah we're not doing buildings anymore
         if (way.tags.ContainsKey("building"))
         {
             // draw building outline
@@ -286,7 +280,8 @@ public partial class MapDrawer : Node2D
             color = Color.FromHtml("89652c");
             layer = 5;
         }
-        else if (way.tags.ContainsKey("water"))
+        else*/
+        if (way.tags.ContainsKey("water"))
         {
             // draw water
             drawSurface = true;
@@ -331,6 +326,13 @@ public partial class MapDrawer : Node2D
                 color = Color.FromHtml("9c8444");
                 layer = 1;
             }
+            else if (natural == "wetland")
+            {
+                // draw grass
+                drawSurface = true;
+                color = Color.FromHtml("997c3e");
+                layer = 1;
+            }
         }
 
         if (way.tags.TryGetValue("leisure", out string leisure))
@@ -365,15 +367,15 @@ public partial class MapDrawer : Node2D
         // check if we decided to draw land earlier
         if (drawSurface)
         {
-            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth, osmData);
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 5, way, mapWorldHeight, mapWorldWidth, osmData);
+            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 5, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
         }
     }
 
-    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         bool closed = false;
-        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData);
+        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
 
         // check if first and last points match
         if (points[0] == points[points.Length - 1])
@@ -400,11 +402,11 @@ public partial class MapDrawer : Node2D
         });
     }
 
-    void DrawPolygonFromWay(Color color, int layer, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    void DrawPolygonFromWay(Color color, int layer, OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         AddChild(new Polygon2D()
         {
-            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData),
+            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize),
             ZIndex = layer,
             Color = color
         });
@@ -429,36 +431,28 @@ public partial class MapDrawer : Node2D
 
     int GetRandomIntFromId(string id, int max)
     {
-        SHA256 sha256 = SHA256.Create();
-
-        // hash id string to use as seed
-        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(id));
-
-        // convert has to int
-        int seed = BitConverter.ToInt32(hashBytes, 0);
-
-        return new Random(seed).Next(max);
+        return new Random(unchecked(int.Parse(id))).Next(max);
     }
 
-    Vector2[] GetPointsFromWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData)
+    Vector2[] GetPointsFromWay(OsmWay way, decimal mapWorldHeight, decimal mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
     {
         // get points from node positions
         Vector2[] points = way.nodeChildren
             .Select((node) =>
             {
                 // convert latitude and longitude to in-game position
-                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth);
+                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth, gameMapSize);
             })
             .ToArray();
 
         return points;
     }
 
-    Vector2 WorldToGamePosition(decimal latitude, decimal longitude, decimal minLatitude, decimal minLongitude, decimal mapWorldHeight, decimal mapWorldWidth)
+    Vector2 WorldToGamePosition(decimal latitude, decimal longitude, decimal minLatitude, decimal minLongitude, decimal mapWorldHeight, decimal mapWorldWidth, Vector2 gameMapSize)
     {
         // calculate scale factor for world to map
-        decimal scaleFactor = (decimal)mapGameSize.X / mapWorldWidth;
-        scaleFactor = Math.Min(scaleFactor, (decimal)mapGameSize.Y / mapWorldHeight);
+        decimal scaleFactor = (decimal)gameMapSize.X / mapWorldWidth;
+        scaleFactor = Math.Min(scaleFactor, (decimal)gameMapSize.Y / mapWorldHeight);
 
         // account for position
         latitude -= minLatitude;
@@ -469,6 +463,6 @@ public partial class MapDrawer : Node2D
         longitude *= scaleFactor;
 
         // convert to float and vector2 with inverse Y axis
-        return new Vector2((float)longitude, mapGameSize.Y - (float)latitude);
+        return new Vector2((float)longitude, gameMapSize.Y - (float)latitude);
     }
 }

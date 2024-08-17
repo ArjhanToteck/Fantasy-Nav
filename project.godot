@@ -25,4 +25,6 @@ enabled=PackedStringArray()
 
 [rendering]
 
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.614857, 0.488993, 0.267036, 1)

@@ -10,7 +10,6 @@ shader_parameter/strength = 0.05
 shader_parameter/flowMap = ExtResource("2_lhfbk")
 
 [node name="Icon" type="Sprite2D"]
-modulate = Color(0, 0, 0, 1)
 self_modulate = Color(0, 0, 0, 1)
 z_index = 6
 material = SubResource("ShaderMaterial_kt1p2")
