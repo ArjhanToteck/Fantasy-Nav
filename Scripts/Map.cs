@@ -36,7 +36,7 @@ public partial class Map : Node2D
         camera = GetNode<Camera2D>("Camera2D");
 
         // adjust map size for screen size
-        gameMapSize = Vector2.One * GetViewportRect().Size.Y * 4.5f;
+        gameMapSize = Vector2.One * GetViewportRect().Size.Y * 3.5f;
 
         // center camera
         camera.Position = new Vector2(gameMapSize.X / 2, gameMapSize.Y / 2);

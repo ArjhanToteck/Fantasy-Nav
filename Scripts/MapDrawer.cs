@@ -259,7 +259,7 @@ public partial class MapDrawer : Node2D
                 return;
             }
 
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 25, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 40, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
 
             return;
         }
@@ -368,7 +368,7 @@ public partial class MapDrawer : Node2D
         if (drawSurface)
         {
             DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 5, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 8, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
         }
     }
 

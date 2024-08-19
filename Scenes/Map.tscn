@@ -9,7 +9,7 @@
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.5, 1.5)
+zoom = Vector2(1.25, 1.25)
 
 [node name="MapDrawer" type="Node2D" parent="."]
 y_sort_enabled = true
