@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public partial class MapDrawer : Node2D
+public partial class MapChunk : Node2D
 {
     public void DrawMap(OsmData osmData, Vector2 gameMapSize)
     {
@@ -290,7 +290,7 @@ public partial class MapDrawer : Node2D
         }
         else if (way.tags.TryGetValue("landuse", out string landuse))
         {
-            if (landuse == "grass")
+            if (landuse == "grass" || landuse == "residential")
             {
                 // draw grass
                 drawSurface = true;

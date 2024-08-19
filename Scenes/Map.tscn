@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://rkfvofxdbuq"]
+[gd_scene load_steps=4 format=3 uid="uid://rkfvofxdbuq"]
 
 [ext_resource type="Script" path="res://Scripts/Map.cs" id="1_ievqj"]
 [ext_resource type="Script" path="res://Scripts/OpenStreetMapAPI.cs" id="2_g4ne2"]
-[ext_resource type="Script" path="res://Scripts/MapDrawer.cs" id="3_3yjvo"]
 [ext_resource type="Script" path="res://Scripts/GpsManager.gd" id="4_6dar0"]
 
 [node name="Map" type="Node2D"]
@@ -11,10 +10,6 @@ script = ExtResource("1_ievqj")
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.25, 1.25)
 
-[node name="MapDrawer" type="Node2D" parent="."]
-y_sort_enabled = true
-script = ExtResource("3_3yjvo")
-
 [node name="OpenStreetMapAPI" type="Node" parent="."]
 script = ExtResource("2_g4ne2")
 
@@ -22,3 +17,5 @@ script = ExtResource("2_g4ne2")
 
 [node name="GpsManager" type="Node" parent="."]
 script = ExtResource("4_6dar0")
+
+[node name="ChunksContainer" type="Node2D" parent="."]
