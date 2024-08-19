@@ -19,22 +19,22 @@ public partial class OpenStreetMapAPI : Node
 		httpRequest = GetNode<HttpRequest>("HTTPRequest");
 	}
 
-	public void FetchMap(Vector2 position, Vector2 size, Action<string> callback)
+	public void FetchMap(double latitude, double longitude, Vector2 size, Action<string> callback)
 	{
 		// calculate bounds
-		float minLatitude = position.Y - (size.Y / 2);
-		float minLongitude = position.X - (size.X / 2);
-		float maxLatitude = position.Y + (size.Y / 2);
-		float maxLongitude = position.X + (size.X / 2);
+		double minLatitude = latitude - size.Y / 2;
+		double minLongitude = longitude - size.X / 2;
+		double maxLatitude = latitude + size.Y / 2;
+		double maxLongitude = longitude + size.X / 2;
 
 		// fetch from bounds
 		FetchMap(minLatitude, minLongitude, maxLatitude, maxLongitude, callback);
 	}
 
-	public void FetchMap(float minLatitude, float minLongitude, float maxLatitude, float maxLongitude, Action<string> callback)
+	public void FetchMap(double minLatitude, double minLongitude, double maxLatitude, double maxLongitude, Action<string> callback)
 	{
 		// format request parameters
-		string boundsString = minLatitude.ToString(CultureInfo.InvariantCulture) + "," + minLongitude.ToString(CultureInfo.InvariantCulture) + "," + maxLatitude.ToString(CultureInfo.InvariantCulture) + "," + maxLongitude.ToString(CultureInfo.InvariantCulture);
+		string boundsString = minLongitude.ToString(CultureInfo.InvariantCulture) + "," + minLatitude.ToString(CultureInfo.InvariantCulture) + "," + maxLongitude.ToString(CultureInfo.InvariantCulture) + "," + maxLatitude.ToString(CultureInfo.InvariantCulture);
 
 		// handle request
 		httpRequest.RequestCompleted += OnRequestCompleted;

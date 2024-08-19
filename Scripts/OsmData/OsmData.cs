@@ -9,10 +9,10 @@ using System.Xml.Linq;
 /// </summary>
 public class OsmData
 {
-    public decimal minLatitude;
-    public decimal minLongitude;
-    public decimal maxLatitude;
-    public decimal maxLongitude;
+    public float minLatitude;
+    public float minLongitude;
+    public float maxLatitude;
+    public float maxLongitude;
     public List<OsmNode> nodes;
     public List<OsmWay> ways;
 
@@ -25,14 +25,14 @@ public class OsmData
 
         // parse boundaries
         XElement boundsElement = xmlDocument.Descendants("bounds").FirstOrDefault();
-        decimal minLatitude = 0, minLongitude = 0, maxLatitude = 0, maxLongitude = 0;
+        float minLatitude = 0, minLongitude = 0, maxLatitude = 0, maxLongitude = 0;
 
         if (boundsElement != null)
         {
-            minLatitude = (decimal)boundsElement.Attribute("minlat");
-            minLongitude = (decimal)boundsElement.Attribute("minlon");
-            maxLatitude = (decimal)boundsElement.Attribute("maxlat");
-            maxLongitude = (decimal)boundsElement.Attribute("maxlon");
+            minLatitude = (float)boundsElement.Attribute("minlat");
+            minLongitude = (float)boundsElement.Attribute("minlon");
+            maxLatitude = (float)boundsElement.Attribute("maxlat");
+            maxLongitude = (float)boundsElement.Attribute("maxlon");
         }
 
         // nodes
@@ -52,8 +52,8 @@ public class OsmData
                     id = (string)nodeElement.Attribute("id"),
                     visible = (bool)nodeElement.Attribute("visible"),
                     tags = tags,
-                    latitude = (decimal)nodeElement.Attribute("lat"),
-                    longitude = (decimal)nodeElement.Attribute("lon")
+                    latitude = (float)nodeElement.Attribute("lat"),
+                    longitude = (float)nodeElement.Attribute("lon")
                 };
             })
             .ToList();

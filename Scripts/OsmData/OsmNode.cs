@@ -4,6 +4,6 @@ using System.Collections.Generic;
 
 public class OsmNode : OsmElement
 {
-    public decimal latitude;
-    public decimal longitude;
+    public double latitude;
+    public double longitude;
 }
