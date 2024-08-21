@@ -5,6 +5,7 @@ using System.Linq;
 
 public partial class MapChunk : Node2D
 {
+    public Map parentMap;
     public OsmData osmData;
     public float gameChunkSize;
     public float worldChunkSize;
@@ -26,7 +27,7 @@ public partial class MapChunk : Node2D
         }
     }
 
-    void DrawWay(OsmWay way)
+    private void DrawWay(OsmWay way)
     {
         // check if invisible
         if (!way.visible)
@@ -40,7 +41,7 @@ public partial class MapChunk : Node2D
         DrawSurface(way);
     }
 
-    void DrawIcon(OsmElement element)
+    private void DrawIcon(OsmElement element)
     {
         // get sprite for icon
         Texture2D iconTexture = null;
@@ -242,14 +243,14 @@ public partial class MapChunk : Node2D
             else
             {
                 OsmNode node = (OsmNode)element;
-                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
+                position = parentMap.WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
             }
 
             DrawIconAtPoint(iconTexture, position);
         }
     }
 
-    void DrawRoad(OsmWay way)
+    private void DrawRoad(OsmWay way)
     {
         if (way.tags.TryGetValue("highway", out string highway))
         {
@@ -265,7 +266,7 @@ public partial class MapChunk : Node2D
         }
     }
 
-    void DrawSurface(OsmWay way)
+    private void DrawSurface(OsmWay way)
     {
         bool drawSurface = false;
         Color color = Colors.White;
@@ -379,7 +380,7 @@ public partial class MapChunk : Node2D
         }
     }
 
-    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way)
+    private void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way)
     {
         bool closed = false;
         Vector2[] points = GetPointsFromWay(way);
@@ -409,7 +410,7 @@ public partial class MapChunk : Node2D
         });
     }
 
-    void DrawPolygonFromWay(Color color, int layer, OsmWay way)
+    private void DrawPolygonFromWay(Color color, int layer, OsmWay way)
     {
         AddChild(new Polygon2D()
         {
@@ -419,7 +420,7 @@ public partial class MapChunk : Node2D
         });
     }
 
-    void DrawIconAtPoint(Texture2D texture, Vector2 position)
+    private void DrawIconAtPoint(Texture2D texture, Vector2 position)
     {
         if (texture == null)
         {
@@ -435,41 +436,22 @@ public partial class MapChunk : Node2D
         AddChild(iconSprite);
     }
 
-    int GetRandomIntFromId(string id, int max)
+    private int GetRandomIntFromId(string id, int max)
     {
         return new Random(unchecked((int)long.Parse(id))).Next(max);
     }
 
-    Vector2[] GetPointsFromWay(OsmWay way)
+    private Vector2[] GetPointsFromWay(OsmWay way)
     {
         // get points from node positions
         Vector2[] points = way.nodeChildren
             .Select((node) =>
             {
                 // convert latitude and longitude to in-game position
-                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
+                return parentMap.WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
             })
             .ToArray();
 
         return points;
-    }
-
-    Vector2 WorldToGamePosition(double latitude, double longitude, double minLatitude, double minLongitude)
-    {
-        // calculate scale factor for world to map
-        double scaleFactor = gameChunkSize / worldChunkSize;
-
-        // account for position
-        latitude -= minLatitude;
-        longitude -= minLongitude;
-
-        // account for scale
-        latitude *= scaleFactor;
-        longitude *= scaleFactor;
-
-        // convert to float and vector2 with inverse Y axis
-        Vector2 worldPosition = new Vector2((float)longitude, (float)(gameChunkSize - latitude));
-
-        return worldPosition;
     }
 }

@@ -121,6 +121,12 @@ public class ChunkGrid
 
     public void Shift(Vector2I direction)
     {
+        // don't do anything if zero
+        if (direction == Vector2I.Zero)
+        {
+            return;
+        }
+
         // temporary array to hold the new positions
         MapChunk[,] newChunks = new MapChunk[3, 3];
 
@@ -136,6 +142,8 @@ public class ChunkGrid
                 // don't delete if out of bounds
                 if (newX >= 3 || newX <= 0 || newY >= 3 || newY <= 0)
                 {
+                    // delete node
+                    chunks[y, x].QueueFree();
                     continue;
                 }
 

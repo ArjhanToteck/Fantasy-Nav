@@ -4,8 +4,8 @@ using System.Diagnostics;
 
 public partial class Map : Node2D
 {
-    private const float worldChunkSize = 0.001f;
-    private float gameChunkSize = 1.25f;
+    private const float worldChunkSize = 0.0015f;
+    private float gameChunkSize = 2.25f;
 
     private ChunkGrid chunkGrid;
 
@@ -20,12 +20,14 @@ public partial class Map : Node2D
 
     public void LocationFailed()
     {
+        GD.Print("location failed");
+
         locationFailed = true;
 
         // sometimes we know if the location failed before _Ready is even called because of how gdscript interoperability works
         if (readyCalled)
         {
-            FirstMapDraw();
+            DrawMap();
         }
     }
     public void UpdateLocation(double latitude, double longitude)
@@ -38,12 +40,46 @@ public partial class Map : Node2D
         {
             // perform initial draw
             initialDraw = true;
-            FirstMapDraw();
+            DrawMap();
 
             return;
         }
 
-        // TODO: move the map here, load and unload chunks
+        // move map to current location
+        OsmData centerOsm = chunkGrid.Center.osmData;
+        camera.Position = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
+
+        // TODO: check here if we are completely out of bounds of grid, erase grid, and then redraw
+
+        // check if we are out of chunk bounds and shift grid towards movement
+        Vector2I shiftDirection = Vector2I.Zero;
+
+        // latitude
+        if (latitude < centerOsm.minLatitude)
+        {
+            shiftDirection += Vector2I.Down;
+        }
+        else if (latitude > centerOsm.minLatitude)
+        {
+            shiftDirection += Vector2I.Up;
+        }
+
+        // longitude
+        if (longitude < centerOsm.minLongitude)
+        {
+            shiftDirection += Vector2I.Left;
+        }
+        else if (longitude > centerOsm.maxLongitude)
+        {
+            shiftDirection += Vector2I.Right;
+        }
+
+        // shift grid if needed
+        if (shiftDirection != Vector2I.Zero)
+        {
+            chunkGrid.Shift(shiftDirection);
+            DrawMap();
+        }
     }
 
     public override void _Ready()
@@ -62,115 +98,113 @@ public partial class Map : Node2D
 
         if (locationFailed)
         {
-            FirstMapDraw();
+            DrawMap();
         }
     }
 
-    void FirstMapDraw()
+    private void DrawMap()
     {
-        chunkGrid = new ChunkGrid()
-        {
-            Center = CreateChunk(
-                // center
-                currentLatitude,
+        chunkGrid ??= new ChunkGrid();
 
-                // center
-                currentLongitude,
+        chunkGrid.Center ??= CreateChunk(
+            // center
+            currentLatitude,
 
-                Vector2.Zero
-            ),
+            // center
+            currentLongitude,
 
-            CenterLeft = CreateChunk(
-                // center
-                currentLatitude,
+            Vector2.Zero
+        );
 
-                // left
-                currentLongitude - worldChunkSize,
+        chunkGrid.CenterLeft ??= CreateChunk(
+            // center
+            currentLatitude,
 
-                new Vector2(-gameChunkSize, 0)
-            ),
+            // left
+            currentLongitude - worldChunkSize,
 
-            CenterRight = CreateChunk(
-                // center
-                currentLatitude,
+            new Vector2(-gameChunkSize, 0)
+        );
 
-                // right
-                currentLongitude + worldChunkSize,
+        chunkGrid.CenterRight ??= CreateChunk(
+            // center
+            currentLatitude,
 
-                new Vector2(gameChunkSize, 0)
-            ),
+            // right
+            currentLongitude + worldChunkSize,
 
-            TopCenter = CreateChunk(
-                // top
-                currentLatitude + worldChunkSize,
+            new Vector2(gameChunkSize, 0)
+        );
 
-                // center
-                currentLongitude,
+        chunkGrid.TopCenter ??= CreateChunk(
+            // top
+            currentLatitude + worldChunkSize,
 
-                new Vector2(0, -gameChunkSize)
-            ),
+            // center
+            currentLongitude,
 
-            BottomCenter = CreateChunk(
-                // bottom
-                currentLatitude - worldChunkSize,
+            new Vector2(0, -gameChunkSize)
+        );
 
-                // center
-                currentLongitude,
+        chunkGrid.BottomCenter ??= CreateChunk(
+            // bottom
+            currentLatitude - worldChunkSize,
 
-                new Vector2(0, gameChunkSize)
-            ),
+            // center
+            currentLongitude,
 
-            TopLeft = CreateChunk(
-                // top
-                currentLatitude + worldChunkSize,
+            new Vector2(0, gameChunkSize)
+        );
 
-                // left
-                currentLongitude - worldChunkSize,
+        chunkGrid.TopLeft ??= CreateChunk(
+            // top
+            currentLatitude + worldChunkSize,
 
-                new Vector2(-gameChunkSize, -gameChunkSize)
-            ),
+            // left
+            currentLongitude - worldChunkSize,
 
-            TopRight = CreateChunk(
-                // top
-                currentLatitude + worldChunkSize,
+            new Vector2(-gameChunkSize, -gameChunkSize)
+        );
 
-                // right
-                currentLongitude + worldChunkSize,
+        chunkGrid.TopRight ??= CreateChunk(
+            // top
+            currentLatitude + worldChunkSize,
 
-                new Vector2(gameChunkSize, -gameChunkSize)
-            ),
+            // right
+            currentLongitude + worldChunkSize,
 
-            BottomLeft = CreateChunk(
-                // bottom
-                currentLatitude - worldChunkSize,
+            new Vector2(gameChunkSize, -gameChunkSize)
+        );
 
-                // left
-                currentLongitude - worldChunkSize,
+        chunkGrid.BottomLeft ??= CreateChunk(
+            // bottom
+            currentLatitude - worldChunkSize,
 
-                new Vector2(-gameChunkSize, gameChunkSize)
-            ),
+            // left
+            currentLongitude - worldChunkSize,
 
-            BottomRight = CreateChunk(
-                // bottom
-                currentLatitude - worldChunkSize,
+            new Vector2(-gameChunkSize, gameChunkSize)
+        );
 
-                // right
-                currentLongitude + worldChunkSize,
+        chunkGrid.BottomRight ??= CreateChunk(
+            // bottom
+            currentLatitude - worldChunkSize,
 
-                new Vector2(gameChunkSize, gameChunkSize)
-            )
-        };
+            // right
+            currentLongitude + worldChunkSize,
+
+            new Vector2(gameChunkSize, gameChunkSize)
+        );
     }
 
-    MapChunk CreateChunk(double latitude, double longitude, Vector2 gameLocation)
+    private MapChunk CreateChunk(double latitude, double longitude, Vector2 gameLocation)
     {
         // load chunk scene
         PackedScene chunkScene = (PackedScene)ResourceLoader.Load("res://Scenes/MapChunk.tscn");
 
         // create chunk
         MapChunk mapChunk = (MapChunk)chunkScene.Instantiate();
-        mapChunk.gameChunkSize = gameChunkSize;
-        mapChunk.worldChunkSize = worldChunkSize;
+        mapChunk.parentMap = this;
 
         // position chunk
         mapChunk.Position = gameLocation;
@@ -193,5 +227,24 @@ public partial class Map : Node2D
         AddChild(mapChunk);
 
         return mapChunk;
+    }
+
+    public Vector2 WorldToGamePosition(double latitude, double longitude, double minLatitude, double minLongitude)
+    {
+        // calculate scale factor for world to map
+        double scaleFactor = gameChunkSize / worldChunkSize;
+
+        // account for position
+        latitude -= minLatitude;
+        longitude -= minLongitude;
+
+        // account for scale
+        latitude *= scaleFactor;
+        longitude *= scaleFactor;
+
+        // convert to float and vector2 with inverse Y axis
+        Vector2 worldPosition = new Vector2((float)longitude, (float)(gameChunkSize - latitude));
+
+        return worldPosition;
     }
 }
