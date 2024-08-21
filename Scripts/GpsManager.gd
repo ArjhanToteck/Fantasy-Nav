@@ -18,13 +18,17 @@ func permissionsCheck(permName, wasGranted):
 	if permName == "android.permission.ACCESS_FINE_LOCATION" and wasGranted == true:
 		enableGPS()
 
-func enableGPS():	
-	# get gps provider from plugin
-	gpsProvider = Engine.get_singleton("PraxisMapperGPSPlugin")
+func enableGPS():
+	# check if we have gps provider
+	if Engine.has_singleton("PraxisMapperGPSPlugin"):
+		# get gps provider from plugin
+		gpsProvider = Engine.get_singleton("PraxisMapperGPSPlugin")
 
-	if gpsProvider != null:
+		# connect and listen
 		gpsProvider.onLocationUpdates.connect(gpsListener)
 		gpsProvider.StartListening()
+	else:
+		$"..".LocationFailed()
 
 func gpsListener(data):
 	# pass location to Map.cs

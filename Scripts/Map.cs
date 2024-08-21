@@ -1,91 +1,76 @@
 using Godot;
 using System;
+using System.Diagnostics;
 
 public partial class Map : Node2D
 {
-    private readonly Vector2 defaultLocation = new Vector2(10.286926f, 53.652949f);
-    private readonly Vector2 worldMapSize = new Vector2(0.001f, 0.001f);
-    private Vector2 gameMapSize;
+    private const float worldChunkSize = 0.001f;
+    private float gameChunkSize = 1.25f;
 
     private ChunkGrid chunkGrid;
-    private OpenStreetMapAPI openStreetMapAPI;
+
+    private OpenStreetMapApi openStreetMapAPI;
     private Camera2D camera;
 
-    double currentLatitude;
-    double currentLongitude;
-    bool mapDrawn = false;
+    private double currentLatitude = 53.652949f;
+    private double currentLongitude = 10.286926f;
+    private bool readyCalled = false;
+    private bool locationFailed = false;
+    private bool initialDraw = false;
 
+    public void LocationFailed()
+    {
+        locationFailed = true;
+
+        // sometimes we know if the location failed before _Ready is even called because of how gdscript interoperability works
+        if (readyCalled)
+        {
+            FirstMapDraw();
+        }
+    }
     public void UpdateLocation(double latitude, double longitude)
     {
-        if (mapDrawn) return;
-        mapDrawn = true;
-
+        // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
 
-        DrawMap();
+        if (!initialDraw)
+        {
+            // perform initial draw
+            initialDraw = true;
+            FirstMapDraw();
+
+            return;
+        }
+
+        // TODO: move the map here, load and unload chunks
     }
 
     public override void _Ready()
     {
+        readyCalled = true;
+
         // get node references
-        openStreetMapAPI = GetNode<OpenStreetMapAPI>("OpenStreetMapAPI");
+        openStreetMapAPI = GetNode<OpenStreetMapApi>("OpenStreetMapApi");
         camera = GetNode<Camera2D>("Camera2D");
 
         // adjust map size for screen size
-        gameMapSize = Vector2.One * GetViewportRect().Size.Y * 1.25f;
+        gameChunkSize *= GetViewportRect().Size.Y;
 
         // center camera
-        camera.Position = new Vector2(gameMapSize.X / 2, gameMapSize.Y / 2);
+        camera.Position = Vector2.One * (gameChunkSize / 2);
 
-        DrawMap();
+        if (locationFailed)
+        {
+            FirstMapDraw();
+        }
     }
 
-    void DrawMap()
+    void FirstMapDraw()
     {
         chunkGrid = new ChunkGrid()
         {
-            topLeft = CreateChunk(
-                // left
-                currentLatitude - worldMapSize.X,
-
-                // top
-                currentLongitude + worldMapSize.Y,
-
-                new Vector2(-gameMapSize.X, -gameMapSize.Y)
-            ),
-
-            topCenter = CreateChunk(
-                // center
-                currentLatitude,
-
-                // top
-                currentLongitude + worldMapSize.Y,
-
-                new Vector2(0, -gameMapSize.Y)
-            ),
-
-            topRight = CreateChunk(
-                // right
-                currentLatitude + worldMapSize.X,
-
-                // top
-                currentLongitude + worldMapSize.Y,
-
-                new Vector2(gameMapSize.X, -gameMapSize.Y)
-            ),
-
-            centerLeft = CreateChunk(
-                // left
-                currentLatitude - worldMapSize.X,
-
-                // center
-                currentLongitude,
-
-                new Vector2(-gameMapSize.X, 0)
-            ),
-
-            center = CreateChunk(
+            Center = CreateChunk(
                 // center
                 currentLatitude,
 
@@ -95,44 +80,84 @@ public partial class Map : Node2D
                 Vector2.Zero
             ),
 
-            centerRight = CreateChunk(
-                // right
-                currentLatitude - worldMapSize.X,
-
-                // center
-                currentLongitude,
-
-                new Vector2(gameMapSize.X, 0)
-            ),
-
-            bottomLeft = CreateChunk(
-                // left
-                currentLatitude + worldMapSize.X,
-
-                // bottom
-                currentLongitude,
-
-                new Vector2(-gameMapSize.X, gameMapSize.Y)
-            ),
-
-            bottomCenter = CreateChunk(
+            CenterLeft = CreateChunk(
                 // center
                 currentLatitude,
 
-                // bottom
-                currentLongitude,
+                // left
+                currentLongitude - worldChunkSize,
 
-                new Vector2(0, gameMapSize.Y)
+                new Vector2(-gameChunkSize, 0)
             ),
 
-            bottomRight = CreateChunk(
-                // right
-                currentLatitude + worldMapSize.X,
+            CenterRight = CreateChunk(
+                // center
+                currentLatitude,
 
-                // bottom
+                // right
+                currentLongitude + worldChunkSize,
+
+                new Vector2(gameChunkSize, 0)
+            ),
+
+            TopCenter = CreateChunk(
+                // top
+                currentLatitude + worldChunkSize,
+
+                // center
                 currentLongitude,
 
-                new Vector2(gameMapSize.X, gameMapSize.Y)
+                new Vector2(0, -gameChunkSize)
+            ),
+
+            BottomCenter = CreateChunk(
+                // bottom
+                currentLatitude - worldChunkSize,
+
+                // center
+                currentLongitude,
+
+                new Vector2(0, gameChunkSize)
+            ),
+
+            TopLeft = CreateChunk(
+                // top
+                currentLatitude + worldChunkSize,
+
+                // left
+                currentLongitude - worldChunkSize,
+
+                new Vector2(-gameChunkSize, -gameChunkSize)
+            ),
+
+            TopRight = CreateChunk(
+                // top
+                currentLatitude + worldChunkSize,
+
+                // right
+                currentLongitude + worldChunkSize,
+
+                new Vector2(gameChunkSize, -gameChunkSize)
+            ),
+
+            BottomLeft = CreateChunk(
+                // bottom
+                currentLatitude - worldChunkSize,
+
+                // left
+                currentLongitude - worldChunkSize,
+
+                new Vector2(-gameChunkSize, gameChunkSize)
+            ),
+
+            BottomRight = CreateChunk(
+                // bottom
+                currentLatitude - worldChunkSize,
+
+                // right
+                currentLongitude + worldChunkSize,
+
+                new Vector2(gameChunkSize, gameChunkSize)
             )
         };
     }
@@ -141,21 +166,28 @@ public partial class Map : Node2D
     {
         // load chunk scene
         PackedScene chunkScene = (PackedScene)ResourceLoader.Load("res://Scenes/MapChunk.tscn");
+
+        // create chunk
         MapChunk mapChunk = (MapChunk)chunkScene.Instantiate();
+        mapChunk.gameChunkSize = gameChunkSize;
+        mapChunk.worldChunkSize = worldChunkSize;
+
+        // position chunk
+        mapChunk.Position = gameLocation;
 
         // get osm data and callback to draw chunk
         Action<string> callback = (osmResponse) =>
         {
+            // create data from raw xml
             OsmData osmData = OsmData.FromRawOsm(osmResponse);
-            mapChunk.DrawMap(osmData, gameMapSize);
+
+            mapChunk.osmData = osmData;
+            // draw map
+            mapChunk.DrawMap();
         };
 
         // get map data
-        // TODO: queue requests so all chunks can be loaded in order
-        openStreetMapAPI.FetchMap(latitude, longitude, worldMapSize, callback);
-
-        // position chunk
-        mapChunk.Position = gameLocation;
+        openStreetMapAPI.FetchMap(latitude, longitude, worldChunkSize, callback);
 
         // include chunk in scene
         AddChild(mapChunk);

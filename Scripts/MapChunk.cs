@@ -5,28 +5,28 @@ using System.Linq;
 
 public partial class MapChunk : Node2D
 {
-    public void DrawMap(OsmData osmData, Vector2 gameMapSize)
-    {
-        // get size of map in world units
-        double mapWorldHeight = osmData.maxLatitude - osmData.minLatitude;
-        double mapWorldWidth = osmData.maxLongitude - osmData.minLongitude;
+    public OsmData osmData;
+    public float gameChunkSize;
+    public float worldChunkSize;
 
+    public void DrawMap()
+    {
         // draw ways
         foreach (OsmWay way in osmData.ways)
         {
             // add way node as child (godot node not osm node)
-            DrawWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawWay(way);
         }
 
         // draw nodes
         foreach (OsmNode node in osmData.nodes)
         {
             // add node as child
-            DrawIcon(node, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawIcon(node);
         }
     }
 
-    void DrawWay(OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawWay(OsmWay way)
     {
         // check if invisible
         if (!way.visible)
@@ -35,12 +35,12 @@ public partial class MapChunk : Node2D
         }
 
         // draw way
-        DrawIcon(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
-        DrawRoad(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
-        DrawSurface(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+        DrawIcon(way);
+        DrawRoad(way);
+        DrawSurface(way);
     }
 
-    void DrawIcon(OsmElement element, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawIcon(OsmElement element)
     {
         // get sprite for icon
         Texture2D iconTexture = null;
@@ -228,7 +228,7 @@ public partial class MapChunk : Node2D
             if (element.GetType() == typeof(OsmWay))
             {
                 // calculate position as center of way
-                Vector2[] points = GetPointsFromWay((OsmWay)element, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+                Vector2[] points = GetPointsFromWay((OsmWay)element);
 
                 // add all points together
                 foreach (Vector2 point in points)
@@ -242,14 +242,14 @@ public partial class MapChunk : Node2D
             else
             {
                 OsmNode node = (OsmNode)element;
-                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth, gameMapSize);
+                position = WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
             }
 
             DrawIconAtPoint(iconTexture, position);
         }
     }
 
-    void DrawRoad(OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawRoad(OsmWay way)
     {
         if (way.tags.TryGetValue("highway", out string highway))
         {
@@ -259,13 +259,13 @@ public partial class MapChunk : Node2D
                 return;
             }
 
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 2, 40, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Road.png"), 4, 40, way);
 
             return;
         }
     }
 
-    void DrawSurface(OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawSurface(OsmWay way)
     {
         bool drawSurface = false;
         Color color = Colors.White;
@@ -290,13 +290,20 @@ public partial class MapChunk : Node2D
         }
         else if (way.tags.TryGetValue("landuse", out string landuse))
         {
-            if (landuse == "grass" || landuse == "residential")
+            if (landuse == "grass")
             {
                 // draw grass
                 drawSurface = true;
                 color = Color.FromHtml("997c3e");
                 layer = 3;
             }
+            /*else if (landuse == "residential")
+            {
+                // draw sidewalk
+                drawSurface = true;
+                color = Color.FromHtml("94743b");
+                layer = 3;
+            }*/
         }
 
         if (way.tags.TryGetValue("surface", out string surface))
@@ -367,15 +374,15 @@ public partial class MapChunk : Node2D
         // check if we decided to draw land earlier
         if (drawSurface)
         {
-            DrawPolygonFromWay(color, layer, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
-            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 8, way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+            DrawPolygonFromWay(color, layer, way);
+            DrawLineFromWay((Texture2D)GD.Load("res://Images/Outline.png"), layer, 8, way);
         }
     }
 
-    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way)
     {
         bool closed = false;
-        Vector2[] points = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize);
+        Vector2[] points = GetPointsFromWay(way);
 
         // check if first and last points match
         if (points[0] == points[points.Length - 1])
@@ -402,15 +409,14 @@ public partial class MapChunk : Node2D
         });
     }
 
-    void DrawPolygonFromWay(Color color, int layer, OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    void DrawPolygonFromWay(Color color, int layer, OsmWay way)
     {
         AddChild(new Polygon2D()
         {
-            Polygon = GetPointsFromWay(way, mapWorldHeight, mapWorldWidth, osmData, gameMapSize),
+            Polygon = GetPointsFromWay(way),
             ZIndex = layer,
             Color = color
         });
-
     }
 
     void DrawIconAtPoint(Texture2D texture, Vector2 position)
@@ -434,25 +440,24 @@ public partial class MapChunk : Node2D
         return new Random(unchecked((int)long.Parse(id))).Next(max);
     }
 
-    Vector2[] GetPointsFromWay(OsmWay way, double mapWorldHeight, double mapWorldWidth, OsmData osmData, Vector2 gameMapSize)
+    Vector2[] GetPointsFromWay(OsmWay way)
     {
         // get points from node positions
         Vector2[] points = way.nodeChildren
             .Select((node) =>
             {
                 // convert latitude and longitude to in-game position
-                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude, mapWorldHeight, mapWorldWidth, gameMapSize);
+                return WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
             })
             .ToArray();
 
         return points;
     }
 
-    Vector2 WorldToGamePosition(double latitude, double longitude, double minLatitude, double minLongitude, double mapWorldHeight, double mapWorldWidth, Vector2 gameMapSize)
+    Vector2 WorldToGamePosition(double latitude, double longitude, double minLatitude, double minLongitude)
     {
         // calculate scale factor for world to map
-        double scaleFactor = gameMapSize.X / mapWorldWidth;
-        scaleFactor = Math.Min(scaleFactor, gameMapSize.Y / mapWorldHeight);
+        double scaleFactor = gameChunkSize / worldChunkSize;
 
         // account for position
         latitude -= minLatitude;
@@ -463,6 +468,8 @@ public partial class MapChunk : Node2D
         longitude *= scaleFactor;
 
         // convert to float and vector2 with inverse Y axis
-        return new Vector2((float)longitude, (float)(gameMapSize.Y - latitude));
+        Vector2 worldPosition = new Vector2((float)longitude, (float)(gameChunkSize - latitude));
+
+        return worldPosition;
     }
 }
