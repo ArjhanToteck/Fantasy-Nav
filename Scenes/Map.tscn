@@ -8,7 +8,7 @@
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.25, 1.25)
+zoom = Vector2(0.75, 0.75)
 
 [node name="OpenStreetMapApi" type="Node" parent="."]
 script = ExtResource("2_g4ne2")
@@ -17,5 +17,3 @@ script = ExtResource("2_g4ne2")
 
 [node name="GpsManager" type="Node" parent="."]
 script = ExtResource("4_6dar0")
-
-[node name="ChunksContainer" type="Node2D" parent="."]

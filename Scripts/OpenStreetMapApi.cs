@@ -23,6 +23,11 @@ public partial class OpenStreetMapApi : Node
 		httpRequest = GetNode<HttpRequest>("HTTPRequest");
 	}
 
+	public void ClearRequestQueue()
+	{
+		requestQueue.Clear();
+	}
+
 	public void FetchMap(double latitude, double longitude, float size, Action<string> callback)
 	{
 		// calculate bounds

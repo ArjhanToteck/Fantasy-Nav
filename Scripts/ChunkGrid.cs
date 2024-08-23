@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 
 public class ChunkGrid
@@ -140,7 +141,7 @@ public class ChunkGrid
                 int newY = y + direction.Y;
 
                 // don't delete if out of bounds
-                if (newX >= 3 || newX <= 0 || newY >= 3 || newY <= 0)
+                if (newX > 2 || newX < 0 || newY > 2 || newY < 0)
                 {
                     // delete node
                     chunks[y, x].QueueFree();

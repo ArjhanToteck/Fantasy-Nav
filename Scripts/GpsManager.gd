@@ -4,6 +4,7 @@ extends Node
 
 var gpsProvider
 
+# TODO: find a way to do this on pc mac and linux
 func _ready():
 	# call permissions check when requesting permissions
 	get_tree().on_request_permissions_result.connect(permissionsCheck)

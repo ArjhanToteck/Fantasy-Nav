@@ -382,6 +382,11 @@ public partial class MapChunk : Node2D
 
     private void DrawLineFromWay(Texture2D texture, int layer, float width, OsmWay way)
     {
+        if (!IsInstanceValid(this))
+        {
+            return;
+        }
+
         bool closed = false;
         Vector2[] points = GetPointsFromWay(way);
 
@@ -412,6 +417,11 @@ public partial class MapChunk : Node2D
 
     private void DrawPolygonFromWay(Color color, int layer, OsmWay way)
     {
+        if (!IsInstanceValid(this))
+        {
+            return;
+        }
+
         AddChild(new Polygon2D()
         {
             Polygon = GetPointsFromWay(way),
@@ -423,6 +433,11 @@ public partial class MapChunk : Node2D
     private void DrawIconAtPoint(Texture2D texture, Vector2 position)
     {
         if (texture == null)
+        {
+            return;
+        }
+
+        if (!IsInstanceValid(this))
         {
             return;
         }
