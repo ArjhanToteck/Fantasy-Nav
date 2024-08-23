@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://dt6kn41nj6ofd"]
 
-[ext_resource type="Shader" path="res://Shaders/Building.gdshader" id="1_nfplo"]
+[ext_resource type="Shader" path="res://Shaders/Icon.gdshader" id="1_nfplo"]
 [ext_resource type="Texture2D" uid="uid://rf5xpj2gwjlg" path="res://Images/FlowMap.jpg" id="2_lhfbk"]
-[ext_resource type="Texture2D" uid="uid://b2ukpu1aitgap" path="res://Images/City.svg" id="3_bw3bx"]
+[ext_resource type="Texture2D" uid="uid://x0ge7kwcs82i" path="res://Images/Logo.svg" id="3_42ki7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_kt1p2"]
 shader = ExtResource("1_nfplo")
@@ -13,4 +13,5 @@ shader_parameter/flowMap = ExtResource("2_lhfbk")
 self_modulate = Color(0, 0, 0, 1)
 z_index = 6
 material = SubResource("ShaderMaterial_kt1p2")
-texture = ExtResource("3_bw3bx")
+position = Vector2(231, 142)
+texture = ExtResource("3_42ki7")
