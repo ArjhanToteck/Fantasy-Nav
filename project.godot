@@ -22,7 +22,7 @@ window/handheld/orientation=1
 
 [dotnet]
 
-project/assembly_name="Map Game Thing"
+project/assembly_name="Fantasy Nav"
 
 [editor_plugins]
 

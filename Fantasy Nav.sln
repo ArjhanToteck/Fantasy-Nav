@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Map Game Thing", "Map Game Thing.csproj", "{0C24011D-76C9-404B-BCB2-4C54B1F6A0FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fantasy Nav", "Fantasy Nav.csproj", "{0C24011D-76C9-404B-BCB2-4C54B1F6A0FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
