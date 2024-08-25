@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://rf5xpj2gwjlg" path="res://Images/FlowMap.jpg" id="2_lhfbk"]
 [ext_resource type="Texture2D" uid="uid://x0ge7kwcs82i" path="res://Images/Logo.svg" id="3_42ki7"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_kt1p2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mxru2"]
 shader = ExtResource("1_nfplo")
 shader_parameter/strength = 0.05
 shader_parameter/flowMap = ExtResource("2_lhfbk")
@@ -12,6 +12,5 @@ shader_parameter/flowMap = ExtResource("2_lhfbk")
 [node name="Icon" type="Sprite2D"]
 self_modulate = Color(0, 0, 0, 1)
 z_index = 6
-material = SubResource("ShaderMaterial_kt1p2")
-position = Vector2(231, 142)
+material = SubResource("ShaderMaterial_mxru2")
 texture = ExtResource("3_42ki7")

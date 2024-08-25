@@ -1,14 +1,86 @@
-[gd_scene load_steps=4 format=3 uid="uid://rkfvofxdbuq"]
+[gd_scene load_steps=11 format=3 uid="uid://rkfvofxdbuq"]
 
 [ext_resource type="Script" path="res://Scripts/Map.cs" id="1_ievqj"]
 [ext_resource type="Script" path="res://Scripts/OpenStreetMapApi.cs" id="2_g4ne2"]
+[ext_resource type="PackedScene" uid="uid://dt6kn41nj6ofd" path="res://Scenes/Icon.tscn" id="2_n8yt3"]
+[ext_resource type="Texture2D" uid="uid://by1cds5s7juhi" path="res://Images/Pin.svg" id="3_3q8wa"]
+[ext_resource type="Shader" path="res://Shaders/Icon.gdshader" id="3_uigp3"]
 [ext_resource type="Script" path="res://Scripts/GpsManager.gd" id="4_6dar0"]
+[ext_resource type="Texture2D" uid="uid://rf5xpj2gwjlg" path="res://Images/FlowMap.jpg" id="4_80luj"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nbnjk"]
+shader = ExtResource("3_uigp3")
+shader_parameter/strength = 0.15
+shader_parameter/flowMap = ExtResource("4_80luj")
+
+[sub_resource type="Animation" id="Animation_0papu"]
+resource_name = "PanelFade"
+length = 3.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Panel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(2.5, 3.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_aney5"]
+_data = {
+"PanelFade": SubResource("Animation_0papu")
+}
 
 [node name="Map" type="Node2D"]
 script = ExtResource("1_ievqj")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(0.75, 0.75)
+
+[node name="Pin" parent="Camera2D" instance=ExtResource("2_n8yt3")]
+visible = false
+z_index = 8
+material = SubResource("ShaderMaterial_nbnjk")
+texture = ExtResource("3_3q8wa")
+
+[node name="Panel" type="Panel" parent="Camera2D"]
+z_index = 9
+clip_contents = true
+custom_minimum_size = Vector2(400, 100)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InfoText" type="RichTextLabel" parent="Camera2D/Panel"]
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading..."
+fit_content = true
+autowrap_mode = 0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Camera2D/Panel"]
+root_node = NodePath("../..")
+libraries = {
+"": SubResource("AnimationLibrary_aney5")
+}
 
 [node name="OpenStreetMapApi" type="Node" parent="."]
 script = ExtResource("2_g4ne2")

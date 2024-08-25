@@ -12,13 +12,15 @@ public partial class Map : Node2D
 
     private OpenStreetMapApi openStreetMapApi;
     private Camera2D camera;
+    private RichTextLabel infoText;
+    private AnimationPlayer infoTextAnimationPlayer;
+    private Sprite2D mapPin;
 
     private double currentLatitude = 53.652949f;
     private double currentLongitude = 10.286926f;
     private bool readyCalled = false;
     private bool locationFailed = false;
-    private bool initialDraw = false;
-    private bool updatingLocation = false;
+    private bool initialDrawStarted = false;
 
     // TODO: add loading and error indicator
     public override void _Ready()
@@ -28,14 +30,17 @@ public partial class Map : Node2D
         // get node references
         openStreetMapApi = GetNode<OpenStreetMapApi>("OpenStreetMapApi");
         camera = GetNode<Camera2D>("Camera2D");
+        infoText = camera.GetNode("Panel").GetNode<RichTextLabel>("InfoText");
+        infoTextAnimationPlayer = camera.GetNode("Panel").GetNode<AnimationPlayer>("AnimationPlayer");
+        mapPin = camera.GetNode<Sprite2D>("Pin");
 
         // adjust map size for screen size
-        gameChunkSize *= GetViewportRect().Size.Y;
+        gameChunkSize *= GetViewportRect().Size.X;
 
         // center camera
         camera.Position = Vector2.One * (gameChunkSize / 2);
 
-        if (locationFailed && !initialDraw)
+        if (locationFailed && !initialDrawStarted)
         {
             DrawMap(currentLatitude, currentLongitude);
         }
@@ -77,7 +82,7 @@ public partial class Map : Node2D
         locationFailed = true;
 
         // sometimes we know if the location failed before _Ready is even called because of how gdscript interoperability works
-        if (readyCalled && !initialDraw)
+        if (readyCalled && !initialDrawStarted)
         {
             DrawMap(currentLatitude, currentLongitude);
         }
@@ -85,24 +90,16 @@ public partial class Map : Node2D
 
     public void UpdateLocation(double latitude, double longitude)
     {
-        if (updatingLocation)
-        {
-            GD.Print("already updating location");
-            return;
-        }
-
-        updatingLocation = true;
+        GD.Print("update location");
 
         // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
 
-        if (!initialDraw)
+        if (!initialDrawStarted)
         {
             // perform initial draw
             DrawMap(currentLatitude, currentLongitude);
-
-            updatingLocation = false;
 
             return;
         }
@@ -150,17 +147,33 @@ public partial class Map : Node2D
 
             // draw map
             DrawMap(centerLatitude, centerLongitude);
-
         }
 
+        // TODO: smooth movement
         camera.Position = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
-
-        updatingLocation = false;
     }
 
     private void DrawMap(double centerLatitude, double centerLongitude)
     {
-        initialDraw = true;
+        // check if this is the first draw
+        if (!initialDrawStarted)
+        {
+            // show pin
+            mapPin.Show();
+
+            if (locationFailed)
+            {
+                infoText.Text = "Location failed, drawing default map...";
+            }
+            else
+            {
+                infoText.Text = "Drawing map...";
+            }
+
+            // fade animation for info box
+            infoTextAnimationPlayer.Play("PanelFade");
+        }
+        initialDrawStarted = true;
 
         // center
         chunkGrid.Center ??= CreateChunk(

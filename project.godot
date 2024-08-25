@@ -10,10 +10,15 @@ config_version=5
 
 [application]
 
-config/name="Map Game Thing"
+config/name="Fantasy Nav"
+config/description="A simple GPS navigator in the style of a fantasy map."
 run/main_scene="res://Scenes/Map.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
-config/icon="res://Icon.png"
+config/icon="res://Images/Icon.png"
+
+[display]
+
+window/handheld/orientation=1
 
 [dotnet]
 
