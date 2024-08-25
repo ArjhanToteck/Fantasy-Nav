@@ -320,21 +320,14 @@ public partial class MapChunk : Node2D
 
         if (way.tags.TryGetValue("natural", out string natural))
         {
-            if (natural == "beach")
+            if (natural == "beach" || natural == "sand")
             {
                 // draw sand
                 drawSurface = true;
                 color = Color.FromHtml("9c8444");
                 layer = 1;
             }
-            else if (natural == "sand")
-            {
-                // draw sand
-                drawSurface = true;
-                color = Color.FromHtml("9c8444");
-                layer = 1;
-            }
-            else if (natural == "wetland")
+            else if (natural == "wetland" || natural == "scrub")
             {
                 // draw grass
                 drawSurface = true;
@@ -354,7 +347,7 @@ public partial class MapChunk : Node2D
             }
             else if (leisure == "pitch")
             {
-                // draw park
+                // draw field
                 drawSurface = true;
                 color = Color.FromHtml("8a6a30");
                 layer = 1;
