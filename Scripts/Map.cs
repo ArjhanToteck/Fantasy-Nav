@@ -6,6 +6,8 @@ using System.Threading.Tasks.Dataflow;
 public partial class Map : Node2D
 {
     private const float worldChunkSize = 0.002f;
+    private const float smoothingSpeed = 5.0f;
+
     private float gameChunkSize = 2.5f;
 
     private ChunkGrid chunkGrid = new ChunkGrid();
@@ -16,6 +18,7 @@ public partial class Map : Node2D
     private AnimationPlayer infoTextAnimationPlayer;
     private Sprite2D mapPin;
 
+    private Vector2 cameraTarget;
     private double currentLatitude = 53.652949f;
     private double currentLongitude = 10.286926f;
     private bool readyCalled = false;
@@ -39,12 +42,20 @@ public partial class Map : Node2D
 
         // center camera
         camera.Position = Vector2.One * (gameChunkSize / 2);
+        cameraTarget = camera.Position;
 
         if (locationFailed && !initialDrawStarted)
         {
             DrawMap(currentLatitude, currentLongitude);
         }
     }
+
+    public override void _Process(double delta)
+    {
+        // approach camera target
+        camera.GlobalPosition = camera.GlobalPosition.Lerp(cameraTarget, (float)(delta * smoothingSpeed));
+    }
+
 
     public override void _Input(InputEvent @event)
     {
@@ -135,6 +146,8 @@ public partial class Map : Node2D
         // load and unload chunks if needed
         if (shiftDirection != Vector2I.Zero)
         {
+            Vector2 oldPosition = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
+
             // shift grid
             chunkGrid.Shift(shiftDirection);
 
@@ -147,10 +160,16 @@ public partial class Map : Node2D
 
             // draw map
             DrawMap(centerLatitude, centerLongitude);
+
+            // calcualte movement caused by grid shift
+            Vector2 shiftDelta = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude) - oldPosition;
+
+            // adjust camera position by the shift to prevent weird movement smoothing
+            camera.GlobalPosition += shiftDelta;
         }
 
-        // TODO: smooth movement
-        camera.Position = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
+        // set camera target when not moving out of chunk
+        cameraTarget = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
     }
 
     private void DrawMap(double centerLatitude, double centerLongitude)
