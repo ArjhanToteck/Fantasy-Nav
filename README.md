@@ -11,3 +11,4 @@ All images and artwork used are available for free use under the public domain (
 - Make available for Windows, Mac, and Linux (can't do web because Godot 4 doesn't support C# for that yet, but maybe I'll suck it up and use gdscript)
 - Draw multipolygons and relations too
 - Texture forests with trees, grass with grass blades, scrub with bushes, etc.
+- Fix weird glitch where app basically crashes if you move too fast/too much
