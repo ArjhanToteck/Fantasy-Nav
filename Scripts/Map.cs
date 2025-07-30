@@ -5,11 +5,9 @@ using System.Threading.Tasks.Dataflow;
 
 public partial class Map : Node2D
 {
-    private const float worldChunkSize = 0.002f;
     private const float smoothingSpeed = 5.0f;
-
+    private const float worldChunkSize = 0.002f;
     private float gameChunkSize = 2.5f;
-
     private ChunkGrid chunkGrid = new ChunkGrid();
 
     private OpenStreetMapApi openStreetMapApi;
@@ -61,6 +59,7 @@ public partial class Map : Node2D
     {
         Vector2I direction = Vector2I.Zero;
 
+        // vertical
         if (Input.IsKeyPressed(Key.Up))
         {
             direction += Vector2I.Down;
@@ -70,6 +69,7 @@ public partial class Map : Node2D
             direction += Vector2I.Up;
         }
 
+        // horizontal
         if (Input.IsKeyPressed(Key.Left))
         {
             direction += Vector2I.Left;
@@ -82,6 +82,7 @@ public partial class Map : Node2D
         // shift grid if needed
         if (direction != Vector2I.Zero)
         {
+            // 0.0005 is just the debug keyboard move amount btw
             UpdateLocation(currentLatitude + (direction.Y * 0.0005), currentLongitude + (direction.X * 0.0005));
         }
     }
@@ -103,6 +104,10 @@ public partial class Map : Node2D
     {
         GD.Print("update location");
 
+        // calculate delta
+        double latitudeDelta = latitude - currentLatitude;
+        double longitudeDelta = longitude - currentLongitude;
+
         // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
@@ -116,7 +121,7 @@ public partial class Map : Node2D
         }
 
         // move map to current location
-        OsmData centerOsm = chunkGrid.Center.osmData;
+        MapChunk centerChunk = chunkGrid.Center;
 
         // TODO: check here if we are completely out of bounds of grid, erase grid, and then redraw
 
@@ -124,21 +129,21 @@ public partial class Map : Node2D
         Vector2I shiftDirection = Vector2I.Zero;
 
         // latitude
-        if (latitude <= centerOsm.minLatitude)
+        if (latitude <= centerChunk.minLatitude)
         {
             shiftDirection += Vector2I.Up;
         }
-        else if (latitude >= centerOsm.maxLatitude)
+        else if (latitude >= centerChunk.maxLatitude)
         {
             shiftDirection += Vector2I.Down;
         }
 
         // longitude
-        if (longitude < centerOsm.minLongitude)
+        if (longitude < centerChunk.minLongitude)
         {
             shiftDirection += Vector2I.Right;
         }
-        else if (longitude > centerOsm.maxLongitude)
+        else if (longitude > centerChunk.maxLongitude)
         {
             shiftDirection += Vector2I.Left;
         }
@@ -146,30 +151,28 @@ public partial class Map : Node2D
         // load and unload chunks if needed
         if (shiftDirection != Vector2I.Zero)
         {
-            Vector2 oldPosition = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
-
             // shift grid
             chunkGrid.Shift(shiftDirection);
+            centerChunk = chunkGrid.Center;
+            GD.Print("shifted");
 
-            // set center to new center after shift
-            centerOsm = chunkGrid.Center.osmData;
+            // TODO: bug: osmData is undefined, because it hasnt loaded yet after shifting
 
             // calculate center of whole map
-            double centerLatitude = centerOsm.minLatitude + worldChunkSize / 2;
-            double centerLongitude = centerOsm.minLongitude + worldChunkSize / 2;
+            double centerLatitude = centerChunk.minLatitude + worldChunkSize / 2;
+            double centerLongitude = centerChunk.minLongitude + worldChunkSize / 2;
 
             // draw map
             DrawMap(centerLatitude, centerLongitude);
 
-            // calcualte movement caused by grid shift
-            Vector2 shiftDelta = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude) - oldPosition;
-
-            // adjust camera position by the shift to prevent weird movement smoothing
-            camera.GlobalPosition += shiftDelta;
+            // adjust camera position by the shift to prevent camera smoothing over too much area
+            camera.GlobalPosition += (Vector2)shiftDirection * gameChunkSize;
         }
 
         // set camera target when not moving out of chunk
-        cameraTarget = WorldToGamePosition(latitude, longitude, centerOsm.minLatitude, centerOsm.minLongitude);
+        GD.Print(WorldToGameDistance(latitudeDelta));
+        GD.Print(WorldToGameDistance(longitudeDelta));
+        cameraTarget = WorldToGamePosition(currentLatitude, currentLongitude, centerChunk.minLatitude, centerChunk.minLongitude);
     }
 
     private void DrawMap(double centerLatitude, double centerLongitude)
@@ -303,6 +306,12 @@ public partial class Map : Node2D
         MapChunk mapChunk = (MapChunk)chunkScene.Instantiate();
         mapChunk.parentMap = this;
 
+        // set latitude and longitude
+        mapChunk.minLatitude = latitude - worldChunkSize / 2;
+        mapChunk.minLongitude = longitude - worldChunkSize / 2;
+        mapChunk.maxLatitude = latitude + worldChunkSize / 2;
+        mapChunk.maxLongitude = longitude + worldChunkSize / 2;
+
         // get osm data and callback to draw chunk
         Action<string> callback = (osmResponse) =>
         {
@@ -310,6 +319,7 @@ public partial class Map : Node2D
             OsmData osmData = OsmData.FromRawOsm(osmResponse);
 
             mapChunk.osmData = osmData;
+
             // draw map
             mapChunk.DrawMap();
         };
@@ -325,20 +335,27 @@ public partial class Map : Node2D
 
     public Vector2 WorldToGamePosition(double latitude, double longitude, double minLatitude, double minLongitude)
     {
-        // calculate scale factor for world to map
-        double scaleFactor = gameChunkSize / worldChunkSize;
-
         // account for position
         latitude -= minLatitude;
         longitude -= minLongitude;
 
-        // account for scale
-        latitude *= scaleFactor;
-        longitude *= scaleFactor;
+        // convert world distance to game distance
+        latitude = WorldToGameDistance(latitude);
+        longitude = WorldToGameDistance(longitude);
 
         // convert to float and vector2 with inverse Y axis
-        Vector2 worldPosition = new Vector2((float)longitude, (float)(gameChunkSize - latitude));
+        Vector2 gamePosition = new Vector2((float)longitude, (float)(gameChunkSize - latitude));
 
-        return worldPosition;
+        return gamePosition;
+    }
+
+    public float WorldToGameDistance(double worldDistance)
+    {
+        // calculate scale factor for world to map
+        double scaleFactor = gameChunkSize / worldChunkSize;
+
+        double gamePosition = worldDistance * scaleFactor;
+
+        return (float)gamePosition;
     }
 }

@@ -7,8 +7,10 @@ public partial class MapChunk : Node2D
 {
     public Map parentMap;
     public OsmData osmData;
-    public float gameChunkSize;
-    public float worldChunkSize;
+    public double minLatitude;
+    public double minLongitude;
+    public double maxLatitude;
+    public double maxLongitude;
 
     public void DrawMap()
     {
@@ -243,7 +245,7 @@ public partial class MapChunk : Node2D
             else
             {
                 OsmNode node = (OsmNode)element;
-                position = parentMap.WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
+                position = parentMap.WorldToGamePosition(node.latitude, node.longitude, minLatitude, minLongitude);
             }
 
             DrawIconAtPoint(iconTexture, position);
@@ -456,7 +458,7 @@ public partial class MapChunk : Node2D
             .Select((node) =>
             {
                 // convert latitude and longitude to in-game position
-                return parentMap.WorldToGamePosition(node.latitude, node.longitude, osmData.minLatitude, osmData.minLongitude);
+                return parentMap.WorldToGamePosition(node.latitude, node.longitude, minLatitude, minLongitude);
             })
             .ToArray();
 

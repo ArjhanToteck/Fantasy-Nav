@@ -9,10 +9,6 @@ using System.Xml.Linq;
 /// </summary>
 public class OsmData
 {
-    public float minLatitude;
-    public float minLongitude;
-    public float maxLatitude;
-    public float maxLongitude;
     public List<OsmNode> nodes;
     public List<OsmWay> ways;
 
@@ -98,10 +94,6 @@ public class OsmData
 
         return new OsmData()
         {
-            minLatitude = minLatitude,
-            minLongitude = minLongitude,
-            maxLatitude = maxLatitude,
-            maxLongitude = maxLongitude,
             nodes = nodes,
             ways = ways
         };
