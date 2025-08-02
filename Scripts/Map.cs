@@ -6,8 +6,8 @@ using System.Threading.Tasks.Dataflow;
 public partial class Map : Node2D
 {
     private const float smoothingSpeed = 5.0f;
-    private const float worldChunkSize = 0.002f;
-    private float gameChunkSize = 2.5f;
+    private const float worldChunkSize = 0.004f;
+    private float gameChunkSize = 5f;
     private ChunkGrid chunkGrid = new ChunkGrid();
 
     private OpenStreetMapApi openStreetMapApi;
@@ -111,6 +111,15 @@ public partial class Map : Node2D
         // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
+
+        // check if moved too far since last time
+        if (latitudeDelta > worldChunkSize * 1.5f || longitudeDelta > worldChunkSize * 1.5f)
+        {
+            // redraw completely
+            DrawMap(currentLatitude, currentLongitude);
+
+            return;
+        }
 
         if (!initialDrawStarted)
         {
