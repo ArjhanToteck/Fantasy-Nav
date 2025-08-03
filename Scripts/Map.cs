@@ -104,18 +104,42 @@ public partial class Map : Node2D
     {
         GD.Print("update location");
 
+        if (!initialDrawStarted)
+        {
+            // perform initial draw
+            DrawMap(currentLatitude, currentLongitude);
+
+            return;
+        }
+
+        // get center chunk
+        MapChunk centerChunk = chunkGrid.Center;
+
         // calculate delta
         double latitudeDelta = Math.Abs(latitude - currentLatitude);
         double longitudeDelta = Math.Abs(longitude - currentLongitude);
+
+        // calculate distance from center
+        double latitudeCenterDistance = Math.Abs(latitude - centerChunk.centerLatitude);
+        double longitudeCenterDistance = Math.Abs(longitude - centerChunk.centerLongitude);
 
         // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
 
-        // check if moved too far since last time
-        if (latitudeDelta > worldChunkSize || longitudeDelta > worldChunkSize)
+        if (
+            // check if moved too far since last time
+            latitudeDelta > worldChunkSize || longitudeDelta > worldChunkSize ||
+
+            // check if we're too far from the center chunk
+            latitudeCenterDistance > worldChunkSize * 2 || longitudeCenterDistance > worldChunkSize * 2
+        )
         {
             GD.Print("moved too far");
+
+            GD.Print(longitudeCenterDistance);
+            GD.Print(latitudeCenterDistance);
+
             // clear chunks
             chunkGrid.Clear();
 
@@ -125,18 +149,9 @@ public partial class Map : Node2D
             return;
         }
 
-        if (!initialDrawStarted)
-        {
-            // perform initial draw
-            DrawMap(currentLatitude, currentLongitude);
 
-            return;
-        }
 
-        // move map to current location
-        MapChunk centerChunk = chunkGrid.Center;
-
-        // TODO: check here if we are completely out of bounds of grid, erase grid, and then redraw
+        // shift map if we're still in reasonable bounds
 
         // check if we are out of chunk bounds and shift grid towards movement
         Vector2I shiftDirection = Vector2I.Zero;
@@ -171,12 +186,8 @@ public partial class Map : Node2D
 
             // TODO: bug: osmData is undefined, because it hasnt loaded yet after shifting
 
-            // calculate center of whole map
-            double centerLatitude = centerChunk.minLatitude + worldChunkSize / 2;
-            double centerLongitude = centerChunk.minLongitude + worldChunkSize / 2;
-
             // draw map
-            DrawMap(centerLatitude, centerLongitude);
+            DrawMap(centerChunk.centerLatitude, centerChunk.centerLongitude);
 
             // adjust camera position by the shift to prevent camera smoothing over too much area
             camera.GlobalPosition += (Vector2)shiftDirection * gameChunkSize;

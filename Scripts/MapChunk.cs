@@ -12,6 +12,22 @@ public partial class MapChunk : Node2D
     public double maxLatitude;
     public double maxLongitude;
 
+    public double centerLatitude
+    {
+        get
+        {
+            return (minLatitude + maxLatitude) / 2;
+        }
+    }
+
+    public double centerLongitude
+    {
+        get
+        {
+            return (minLongitude + maxLongitude) / 2;
+        }
+    }
+
     public void DrawMap()
     {
         // draw relations
