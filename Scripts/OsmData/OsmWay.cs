@@ -4,6 +4,6 @@ using System.Collections.Generic;
 
 public class OsmWay : OsmElement
 {
-    public List<string> nodeChildIDs;
+    public List<string> nodeChildIds;
     public List<OsmNode> nodeChildren;
 }

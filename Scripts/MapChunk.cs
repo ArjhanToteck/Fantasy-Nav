@@ -14,22 +14,44 @@ public partial class MapChunk : Node2D
 
     public void DrawMap()
     {
+        // draw relations
+        foreach (OsmRelation relation in osmData.relations)
+        {
+            DrawRelation(relation);
+        }
+
         // draw ways
         foreach (OsmWay way in osmData.ways)
         {
-            // add way node as child (godot node not osm node)
             DrawWay(way);
         }
 
         // draw nodes
         foreach (OsmNode node in osmData.nodes)
         {
-            // add node as child
             DrawIcon(node);
         }
     }
 
-    private void DrawWay(OsmWay way)
+    private void DrawRelation(OsmRelation relation)
+    {
+        // check if invisible
+        if (!relation.visible)
+        {
+            return;
+        }
+
+        // draw each outer way
+        foreach (OsmWay way in relation.outerBoundaries)
+        {
+            // TODO: the relation has extra tags needed by the way
+            DrawWay(way, relation.tags);
+        }
+
+        // TODO: draw inner boundaries too (but they might be kinda weird)
+    }
+
+    private void DrawWay(OsmWay way, Dictionary<string, string> extraTags = null)
     {
         // check if invisible
         if (!way.visible)
@@ -38,20 +60,36 @@ public partial class MapChunk : Node2D
         }
 
         // draw way
-        DrawIcon(way);
-        DrawRoad(way);
-        DrawSurface(way);
+        DrawIcon(way, extraTags);
+        DrawRoad(way, extraTags);
+        DrawSurface(way, extraTags);
     }
 
-    private void DrawIcon(OsmElement element)
+    private void DrawIcon(OsmElement element, Dictionary<string, string> extraTags = null)
     {
         // get sprite for icon
         Texture2D iconTexture = null;
 
-        // switch building type
-        if (element.tags.TryGetValue("building", out string building))
+        Dictionary<string, string> tags = element.tags;
+
+        // check if we have extra tags to add
+        if (extraTags != null)
         {
-            if (building == "religious" || building == "church" || element.tags.ContainsKey("religion"))
+            foreach (var property in extraTags)
+            {
+                // only add property if it won't overwrite an existing one (child trumps parent)
+                if (!tags.ContainsKey(property.Key))
+                {
+                    tags.Add(property.Key, property.Value);
+                }
+
+            }
+        }
+
+        // switch building type
+        if (tags.TryGetValue("building", out string building))
+        {
+            if (building == "religious" || building == "church" || tags.ContainsKey("religion"))
             {
                 iconTexture = (Texture2D)GD.Load("res://Images/Cathedral.svg");
             }
@@ -119,7 +157,7 @@ public partial class MapChunk : Node2D
         }
 
         // switch artwork type
-        if (element.tags.TryGetValue("artwork_type", out string artworkType))
+        if (tags.TryGetValue("artwork_type", out string artworkType))
         {
             if (artworkType == "statue" || artworkType == "sculpture" || artworkType == "stone" || artworkType == "installation" || artworkType == "bust")
             {
@@ -130,7 +168,7 @@ public partial class MapChunk : Node2D
         }
 
         // switch memorial type
-        if (element.tags.TryGetValue("memorial", out string memorial))
+        if (tags.TryGetValue("memorial", out string memorial))
         {
             if (artworkType == "statue" || artworkType == "sculpture" || artworkType == "stone" || artworkType == "obelisk" || artworkType == "bust")
             {
@@ -141,7 +179,7 @@ public partial class MapChunk : Node2D
         }
 
         // switch amenity type
-        if (element.tags.TryGetValue("amenity", out string amenity))
+        if (tags.TryGetValue("amenity", out string amenity))
         {
             if (amenity == "fountain")
             {
@@ -150,7 +188,7 @@ public partial class MapChunk : Node2D
         }
 
         // switch man made type
-        if (element.tags.TryGetValue("man_made", out string manMade))
+        if (tags.TryGetValue("man_made", out string manMade))
         {
             if (manMade == "water_well")
             {
@@ -163,7 +201,7 @@ public partial class MapChunk : Node2D
         }
 
         // natural
-        if (element.tags.TryGetValue("natural", out string natural))
+        if (tags.TryGetValue("natural", out string natural))
         {
             if (natural == "peak")
             {
@@ -180,7 +218,7 @@ public partial class MapChunk : Node2D
         }
 
         // attraction
-        if (element.tags.TryGetValue("attraction", out string attraction))
+        if (tags.TryGetValue("attraction", out string attraction))
         {
             if (attraction == "maze")
             {
@@ -189,7 +227,7 @@ public partial class MapChunk : Node2D
         }
 
         // leisure
-        if (element.tags.TryGetValue("leisure", out string leisure))
+        if (tags.TryGetValue("leisure", out string leisure))
         {
             if (leisure == "maze")
             {
@@ -198,7 +236,7 @@ public partial class MapChunk : Node2D
         }
 
         // tourism
-        if (element.tags.TryGetValue("tourism", out string tourism))
+        if (tags.TryGetValue("tourism", out string tourism))
         {
             if (tourism == "hotel")
             {
@@ -207,7 +245,7 @@ public partial class MapChunk : Node2D
         }
 
         // historic
-        if (element.tags.TryGetValue("historic", out string historic))
+        if (tags.TryGetValue("historic", out string historic))
         {
             if (historic == "mine" || historic == "mine_shaft")
             {
@@ -216,7 +254,7 @@ public partial class MapChunk : Node2D
         }
 
         // check if sign
-        if (element.tags.ContainsKey("crossing") || element.tags.ContainsKey("traffic_sign"))
+        if (tags.ContainsKey("crossing") || tags.ContainsKey("traffic_sign"))
         {
             // can be Sign0, Sign1, Sign2
             int variant = GetRandomIntFromId(element.id, 3);
@@ -242,7 +280,7 @@ public partial class MapChunk : Node2D
                 // divide x and y by number of points to get mean
                 position = position / new Vector2(points.Length, points.Length);
             }
-            else
+            else if (element.GetType() == typeof(OsmNode))
             {
                 OsmNode node = (OsmNode)element;
                 position = parentMap.WorldToGamePosition(node.latitude, node.longitude, minLatitude, minLongitude);
@@ -252,9 +290,26 @@ public partial class MapChunk : Node2D
         }
     }
 
-    private void DrawRoad(OsmWay way)
+    private void DrawRoad(OsmWay way, Dictionary<string, string> extraTags = null)
     {
-        if (way.tags.TryGetValue("highway", out string highway))
+
+        Dictionary<string, string> tags = way.tags;
+
+        // check if we have extra tags to add
+        if (extraTags != null)
+        {
+            foreach (var property in extraTags)
+            {
+                // only add property if it won't overwrite an existing one (child trumps parent)
+                if (!tags.ContainsKey(property.Key))
+                {
+                    tags.Add(property.Key, property.Value);
+                }
+
+            }
+        }
+
+        if (tags.TryGetValue("highway", out string highway))
         {
             // exclude footways and paths
             if (highway == "footway" || highway == "path")
@@ -268,15 +323,31 @@ public partial class MapChunk : Node2D
         }
     }
 
-    private void DrawSurface(OsmWay way)
+    private void DrawSurface(OsmWay way, Dictionary<string, string> extraTags = null)
     {
         bool drawSurface = false;
         Color color = Colors.White;
         int layer = 0;
 
+        Dictionary<string, string> tags = way.tags;
+
+        // check if we have extra tags to add
+        if (extraTags != null)
+        {
+            foreach (var property in extraTags)
+            {
+                // only add property if it won't overwrite an existing one (child trumps parent)
+                if (!tags.ContainsKey(property.Key))
+                {
+                    tags.Add(property.Key, property.Value);
+                }
+
+            }
+        }
+
         /*
         // yeah we're not doing buildings anymore
-        if (way.tags.ContainsKey("building"))
+        if (tags.ContainsKey("building"))
         {
             // draw building outline
             drawSurface = true;
@@ -284,14 +355,14 @@ public partial class MapChunk : Node2D
             layer = 5;
         }
         else*/
-        if (way.tags.ContainsKey("water"))
+        if (tags.ContainsKey("water"))
         {
             // draw water
             drawSurface = true;
             color = Color.FromHtml("90784d");
             layer = 1;
         }
-        else if (way.tags.TryGetValue("landuse", out string landuse))
+        else if (tags.TryGetValue("landuse", out string landuse))
         {
             if (landuse == "grass")
             {
@@ -309,7 +380,7 @@ public partial class MapChunk : Node2D
             }*/
         }
 
-        if (way.tags.TryGetValue("surface", out string surface))
+        if (tags.TryGetValue("surface", out string surface))
         {
             if (surface == "sand")
             {
@@ -320,7 +391,7 @@ public partial class MapChunk : Node2D
             }
         }
 
-        if (way.tags.TryGetValue("natural", out string natural))
+        if (tags.TryGetValue("natural", out string natural))
         {
             if (natural == "beach" || natural == "sand")
             {
@@ -338,7 +409,7 @@ public partial class MapChunk : Node2D
             }
         }
 
-        if (way.tags.TryGetValue("leisure", out string leisure))
+        if (tags.TryGetValue("leisure", out string leisure))
         {
             if (leisure == "park")
             {
@@ -356,7 +427,7 @@ public partial class MapChunk : Node2D
             }
         }
 
-        if (way.tags.TryGetValue("parking", out string parking))
+        if (tags.TryGetValue("parking", out string parking))
         {
             if (parking == "surface")
             {

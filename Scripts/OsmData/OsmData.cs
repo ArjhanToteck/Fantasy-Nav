@@ -11,8 +11,7 @@ public class OsmData
 {
     public List<OsmNode> nodes;
     public List<OsmWay> ways;
-
-    // TODO: add relations
+    public List<OsmRelation> relations;
 
     public static OsmData FromRawOsm(string rawOsm)
     {
@@ -67,18 +66,15 @@ public class OsmData
                     );
 
                 // get ids for referenced child nodes
-                List<string> nodeChildIDs = wayElement.Descendants("nd")
-                .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("ref"))
-                .ToList();
+                List<string> nodeChildIds = wayElement.Descendants("nd")
+                    .Select(nodeReferenceElement => (string)nodeReferenceElement.Attribute("ref"))
+                    .ToList();
 
                 // get node children for each id
-                List<OsmNode> nodeChildren = nodeChildIDs
-                .Select((id) =>
-                {
-                    // find node with matching id in list
-                    return nodes.Find(node => node.id == id);
-                })
-                .ToList();
+                List<OsmNode> nodeChildren = nodeChildIds
+                    .Select(id => nodes.Find(node => node.id == id))
+                    .Where(node => node != null)
+                    .ToList();
 
                 // create way with retrieved data
                 return new OsmWay
@@ -86,16 +82,85 @@ public class OsmData
                     id = (string)wayElement.Attribute("id"),
                     visible = (bool)wayElement.Attribute("visible"),
                     tags = tags,
-                    nodeChildIDs = nodeChildIDs,
+                    nodeChildIds = nodeChildIds,
                     nodeChildren = nodeChildren,
                 };
             })
             .ToList();
 
+        List<OsmRelation> relations = xmlDocument.Descendants("relation")
+        .Select((relationElement) =>
+        {
+            // create dictionary for tags
+            Dictionary<string, string> tags = relationElement.Descendants("tag")
+                .ToDictionary(
+                    tagElement => (string)tagElement.Attribute("k"),
+                    tagElement => (string)tagElement.Attribute("v")
+                );
+
+            // get ids for referenced child nodes
+            List<string> outerBoundaryIds = new List<string>();
+            List<string> innerBoundaryIds = new List<string>();
+
+            // loop through ways in relation
+            foreach (var member in relationElement.Descendants("member"))
+            {
+                // skip non ways
+                string type = (string)member.Attribute("type");
+                if (type != "way")
+                {
+                    continue;
+                }
+
+                // get role and id
+                string role = (string)member.Attribute("role");
+                string refId = (string)member.Attribute("ref");
+
+                if (refId != null)
+                {
+                    // separate by inner/outer
+                    if (role == "outer")
+                    {
+                        outerBoundaryIds.Add(refId);
+                    }
+                    else if (role == "inner")
+                    {
+                        innerBoundaryIds.Add(refId);
+                    }
+                }
+            }
+
+            // get way children for each outer id
+            List<OsmWay> outerBoundaries = outerBoundaryIds
+                .Select(id => ways.Find(way => way.id == id))
+                .Where(way => way != null)
+                .ToList();
+
+            // get way children for each inner id
+            List<OsmWay> innerBoundaries = innerBoundaryIds
+                .Select(id => ways.Find(way => way.id == id))
+                .Where(way => way != null)
+                .ToList();
+
+            // create relation with retrieved data
+            return new OsmRelation
+            {
+                id = (string)relationElement.Attribute("id"),
+                visible = (bool)relationElement.Attribute("visible"),
+                tags = tags,
+                innerBoundaries = innerBoundaries,
+                innerBoundaryIds = innerBoundaryIds,
+                outerBoundaries = outerBoundaries,
+                outerBoundaryIds = outerBoundaryIds
+            };
+        })
+        .ToList();
+
         return new OsmData()
         {
             nodes = nodes,
-            ways = ways
+            ways = ways,
+            relations = relations
         };
     }
 }
