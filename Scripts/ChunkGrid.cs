@@ -156,4 +156,18 @@ public class ChunkGrid
         // Update the chunks with the shifted chunks
         chunks = newChunks;
     }
+
+    public void Clear()
+    {
+        // loop through each old chunk to delete them
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {
+                // delete node
+                chunks[y, x].QueueFree();
+                chunks[y, x] = null;
+            }
+        }
+    }
 }

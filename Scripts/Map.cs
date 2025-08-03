@@ -83,7 +83,7 @@ public partial class Map : Node2D
         if (direction != Vector2I.Zero)
         {
             // 0.0005 is just the debug keyboard move amount btw
-            UpdateLocation(currentLatitude + (direction.Y * 0.0005), currentLongitude + (direction.X * 0.0005));
+            UpdateLocation(currentLatitude + (direction.Y * 0.05), currentLongitude + (direction.X * 0.05));
         }
     }
 
@@ -105,16 +105,20 @@ public partial class Map : Node2D
         GD.Print("update location");
 
         // calculate delta
-        double latitudeDelta = latitude - currentLatitude;
-        double longitudeDelta = longitude - currentLongitude;
+        double latitudeDelta = Math.Abs(latitude - currentLatitude);
+        double longitudeDelta = Math.Abs(longitude - currentLongitude);
 
         // update coordinates
         currentLatitude = latitude;
         currentLongitude = longitude;
 
         // check if moved too far since last time
-        if (latitudeDelta > worldChunkSize * 1.5f || longitudeDelta > worldChunkSize * 1.5f)
+        if (latitudeDelta > worldChunkSize || longitudeDelta > worldChunkSize)
         {
+            GD.Print("moved too far");
+            // clear chunks
+            chunkGrid.Clear();
+
             // redraw completely
             DrawMap(currentLatitude, currentLongitude);
 
@@ -179,8 +183,6 @@ public partial class Map : Node2D
         }
 
         // set camera target when not moving out of chunk
-        GD.Print(WorldToGameDistance(latitudeDelta));
-        GD.Print(WorldToGameDistance(longitudeDelta));
         cameraTarget = WorldToGamePosition(currentLatitude, currentLongitude, centerChunk.minLatitude, centerChunk.minLongitude);
     }
 
