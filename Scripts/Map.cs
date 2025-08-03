@@ -83,7 +83,7 @@ public partial class Map : Node2D
         if (direction != Vector2I.Zero)
         {
             // 0.0005 is just the debug keyboard move amount btw
-            UpdateLocation(currentLatitude + (direction.Y * 0.05), currentLongitude + (direction.X * 0.05));
+            UpdateLocation(currentLatitude + (direction.Y * 0.0005), currentLongitude + (direction.X * 0.0005));
         }
     }
 
