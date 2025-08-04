@@ -44,6 +44,7 @@ public partial class Map : Node2D
 
         if (locationFailed && !initialDrawStarted)
         {
+            GD.Print("location failed");
             DrawMap(currentLatitude, currentLongitude);
         }
     }
@@ -57,33 +58,37 @@ public partial class Map : Node2D
 
     public override void _Input(InputEvent @event)
     {
-        Vector2I direction = Vector2I.Zero;
+        // check if running in editor
+        if (Engine.IsEditorHint())
+        {
+            Vector2I direction = Vector2I.Zero;
 
-        // vertical
-        if (Input.IsKeyPressed(Key.Up))
-        {
-            direction += Vector2I.Down;
-        }
-        else if (Input.IsKeyPressed(Key.Down))
-        {
-            direction += Vector2I.Up;
-        }
+            // vertical
+            if (Input.IsKeyPressed(Key.Up))
+            {
+                direction += Vector2I.Down;
+            }
+            else if (Input.IsKeyPressed(Key.Down))
+            {
+                direction += Vector2I.Up;
+            }
 
-        // horizontal
-        if (Input.IsKeyPressed(Key.Left))
-        {
-            direction += Vector2I.Left;
-        }
-        else if (Input.IsKeyPressed(Key.Right))
-        {
-            direction += Vector2I.Right;
-        }
+            // horizontal
+            if (Input.IsKeyPressed(Key.Left))
+            {
+                direction += Vector2I.Left;
+            }
+            else if (Input.IsKeyPressed(Key.Right))
+            {
+                direction += Vector2I.Right;
+            }
 
-        // shift grid if needed
-        if (direction != Vector2I.Zero)
-        {
-            // 0.0005 is just the debug keyboard move amount btw
-            UpdateLocation(currentLatitude + (direction.Y * 0.0005), currentLongitude + (direction.X * 0.0005));
+            // shift grid if needed
+            if (direction != Vector2I.Zero)
+            {
+                // 0.0005 is just the debug keyboard move amount btw
+                UpdateLocation(currentLatitude + (direction.Y * 0.0005), currentLongitude + (direction.X * 0.0005));
+            }
         }
     }
 
@@ -106,6 +111,10 @@ public partial class Map : Node2D
 
         if (!initialDrawStarted)
         {
+            // update coordinates
+            currentLatitude = latitude;
+            currentLongitude = longitude;
+
             // perform initial draw
             DrawMap(currentLatitude, currentLongitude);
 
@@ -137,14 +146,8 @@ public partial class Map : Node2D
         {
             GD.Print("moved too far");
 
-            GD.Print(longitudeCenterDistance);
-            GD.Print(latitudeCenterDistance);
-
-            // clear chunks
-            chunkGrid.Clear();
-
             // redraw completely
-            DrawMap(currentLatitude, currentLongitude);
+            OverwriteMap(currentLatitude, currentLongitude);
 
             return;
         }
@@ -182,9 +185,6 @@ public partial class Map : Node2D
             // shift grid
             chunkGrid.Shift(shiftDirection);
             centerChunk = chunkGrid.Center;
-            GD.Print("shifted");
-
-            // TODO: bug: osmData is undefined, because it hasnt loaded yet after shifting
 
             // draw map
             DrawMap(centerChunk.centerLatitude, centerChunk.centerLongitude);
@@ -195,6 +195,19 @@ public partial class Map : Node2D
 
         // set camera target when not moving out of chunk
         cameraTarget = WorldToGamePosition(currentLatitude, currentLongitude, centerChunk.minLatitude, centerChunk.minLongitude);
+    }
+
+    // completely erases old map and draws new one
+    private void OverwriteMap(double centerLatitude, double centerLongitude)
+    {
+        // clear chunk grid
+        chunkGrid.Clear();
+
+        // clear all previous requests
+        openStreetMapApi.ClearRequestQueue();
+
+        // draw map
+        DrawMap(centerLatitude, centerLongitude);
     }
 
     private void DrawMap(double centerLatitude, double centerLongitude)
