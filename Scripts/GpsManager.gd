@@ -5,6 +5,11 @@ extends Node
 var gpsProvider
 var locationFailed = false
 
+@export var info_text: RichTextLabel
+
+signal location_failed
+signal update_location(latitude: int, longitude: int)
+
 # TODO: find a way to do this on pc mac and linux
 func _ready():
 	# call permissions check when requesting permissions
@@ -17,16 +22,16 @@ func _ready():
 		enableGPS()
 	elif (not locationFailed):
 		locationFailed = true
-		$"../Camera2D/Panel/InfoText".text = "Location permission is required"
-		$"..".LocationFailed()
+		info_text.text = "Location permission is required"
+		location_failed.emit()
 
 func permissionsCheck(permName, wasGranted):
 	if permName == "android.permission.ACCESS_FINE_LOCATION" and wasGranted == true:
 		enableGPS()
 	elif (not locationFailed):
 		locationFailed = true
-		$"../Camera2D/Panel/InfoText".text = "Location permission is required"
-		$"..".LocationFailed()
+		info_text.text = "Location permission is required"
+		location_failed.emit()
 
 func enableGPS():
 	# check if we have gps provider
@@ -39,10 +44,10 @@ func enableGPS():
 		gpsProvider.StartListening()
 	elif (not locationFailed):
 		locationFailed = true
-		$"../Camera2D/Panel/InfoText".text = "Location access request failed"
-		$"..".LocationFailed()
+		info_text.text = "Location access request failed"
+		location_failed.emit()
 
 func gpsListener(data):
 	print("update location")
 	# pass location to Map.cs
-	$"..".UpdateLocation(data["latitude"], data["longitude"])
+	update_location.emit(data["latitude"], data["longitude"])

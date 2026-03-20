@@ -1,7 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkc4qm26xo5nx"]
+[gd_scene format=3 uid="uid://bkc4qm26xo5nx"]
 
-[ext_resource type="Script" path="res://Scripts/MapChunk.cs" id="1_fk8hx"]
+[ext_resource type="Script" uid="uid://gnh216b8bq12" path="res://Scripts/MapChunk.gd" id="1_rj2hm"]
 
-[node name="MapChunk" type="Node2D"]
+[node name="MapChunk" type="Node2D" unique_id=37129159]
 y_sort_enabled = true
-script = ExtResource("1_fk8hx")
+script = ExtResource("1_rj2hm")
