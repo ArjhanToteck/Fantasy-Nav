@@ -40,7 +40,7 @@ public partial class OpenStreetMapApi : Node
 		FetchMap(minLatitude, minLongitude, maxLatitude, maxLongitude, callback);
 	}
 
-	public void FetchMap(OpenStreetMapApiRequest request)
+	private void FetchMap(OpenStreetMapApiRequest request)
 	{
 		FetchMap(request.minLatitude, request.minLongitude, request.maxLatitude, request.maxLongitude, request.callback);
 	}
@@ -86,6 +86,24 @@ public partial class OpenStreetMapApi : Node
 
 			// make callback
 			callback.Invoke(osmResponse);
+		}
+	}
+
+	private class OpenStreetMapApiRequest
+	{
+		public double minLatitude;
+		public double minLongitude;
+		public double maxLatitude;
+		public double maxLongitude;
+		public Action<string> callback;
+
+		public OpenStreetMapApiRequest(double minLatitude, double minLongitude, double maxLatitude, double maxLongitude, Action<string> callback)
+		{
+			this.minLatitude = minLatitude;
+			this.minLongitude = minLongitude;
+			this.maxLatitude = maxLatitude;
+			this.maxLongitude = maxLongitude;
+			this.callback = callback;
 		}
 	}
 }
