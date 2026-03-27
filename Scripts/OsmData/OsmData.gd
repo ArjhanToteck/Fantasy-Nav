@@ -7,6 +7,7 @@ var ways: Array[OsmWay] = []
 var relations: Array[OsmRelation] = []
 
 static func from_raw_osm(raw_osm: String) -> OsmData:
+	# TODO: this is kinda ass, clean up
 	var parser := XMLParser.new()
 	var data := OsmData.new()
 	

@@ -53,7 +53,8 @@ func _process(delta: float) -> void:
 
 func _input(_event: InputEvent) -> void:
 	# editor mode controls
-	if Engine.is_editor_hint():
+	# TODO: remove
+	if true: # if Engine.is_editor_hint():
 		var direction: Vector2i = Vector2i.ZERO
 
 		# vertical
@@ -87,8 +88,8 @@ func update_location(latitude: float, longitude: float) -> void:
 
 	var latitude_delta: float = abs(latitude - current_latitude)
 	var longitude_delta: float = abs(longitude - current_longitude)
-	var latitude_center_distance: float = abs(latitude - center_chunk.center_latitude)
-	var longitude_center_distance: float = abs(longitude - center_chunk.center_longitude)
+	var latitude_center_distance: float = abs(latitude - center_chunk.get_center_latitude())
+	var longitude_center_distance: float = abs(longitude - center_chunk.get_center_longitude())
 
 	current_latitude = latitude
 	current_longitude = longitude
@@ -116,7 +117,7 @@ func update_location(latitude: float, longitude: float) -> void:
 	if shift_direction != Vector2i.ZERO:
 		chunk_grid.shift(shift_direction)
 		center_chunk = chunk_grid.get_center_()
-		draw_map(center_chunk.center_latitude, center_chunk.center_longitude)
+		draw_map(center_chunk.get_center_latitude(), center_chunk.get_center_longitude())
 		camera.global_position += Vector2(shift_direction) * game_chunk_size
 
 	# update camera target
@@ -186,16 +187,16 @@ func create_chunk(latitude: float, longitude: float) -> MapChunk:
 	map_chunk.max_longitude = longitude + world_chunk_size / 2
 
 	# fetch osm data with callback
-	var chunk_callback = func(osm_response: String) -> void:
+	var chunk_callback = func(osm_response: String, chunk: MapChunk) -> void:
 		# TODO: maybe refactor this to OpenStreetMapApi
 		# create data from raw xml
 		var osm_data: OsmData = OsmData.from_raw_osm(osm_response)
-		map_chunk.osm_data = osm_data
+		chunk.osm_data = osm_data
 
 		# draw map
-		map_chunk.draw_map()
+		chunk.draw_map()
 
-	open_street_map_api.fetch_map_from_point(latitude, longitude, world_chunk_size, chunk_callback)
+	open_street_map_api.fetch_map_from_point(latitude, longitude, world_chunk_size, chunk_callback.bind(map_chunk))
 	
 	# add chunk to scene
 	add_child(map_chunk)
