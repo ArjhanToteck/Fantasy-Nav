@@ -187,6 +187,7 @@ func create_chunk(latitude: float, longitude: float) -> MapChunk:
 
 	# fetch osm data with callback
 	var chunk_callback = func(osm_response: String) -> void:
+		# TODO: maybe refactor this to OpenStreetMapApi
 		# create data from raw xml
 		var osm_data: OsmData = OsmData.from_raw_osm(osm_response)
 		map_chunk.osm_data = osm_data
@@ -194,7 +195,7 @@ func create_chunk(latitude: float, longitude: float) -> MapChunk:
 		# draw map
 		map_chunk.draw_map()
 
-	open_street_map_api.fetch_map_from_point(latitude, longitude, world_chunk_size, Callable(chunk_callback))
+	open_street_map_api.fetch_map_from_point(latitude, longitude, world_chunk_size, chunk_callback)
 	
 	# add chunk to scene
 	add_child(map_chunk)

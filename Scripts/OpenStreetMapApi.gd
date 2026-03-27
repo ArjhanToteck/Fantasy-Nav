@@ -55,9 +55,6 @@ func _fetch_map_from_bounds(min_latitude: float, min_longitude: float, max_latit
 # this should be connected to the http request's request signal
 func _on_http_request_request_completed(_result: int, _response_code: int, _headers: PackedStringArray, body: PackedByteArray):
 	# TODO: should probably check for request failure and shit
-	# no longer busy
-    making_request = false
-
     # call next in queue and dequeue
     if request_queue.size() > 0:
         _fetch_map_from_request(request_queue.pop_front())
@@ -69,6 +66,14 @@ func _on_http_request_request_completed(_result: int, _response_code: int, _head
     if _current_callback != null and _current_callback is Callable:
         _current_callback.call(osm_response)
         _current_callback = null
+    
+	# no longer busy
+    making_request = false
+
+    # move to next request if applicable
+    if !request_queue.is_empty():
+        var request: OpenStreetMapApiRequest = request_queue.pop_front()
+        _fetch_map_from_request(request)
 
 
 class OpenStreetMapApiRequest:
